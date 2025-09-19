@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Activity, ArrowLeft } from 'lucide-react';
+import { Activity, ArrowLeft, X, Calendar, Clock, User, Stethoscope, Activity as StatusIcon } from 'lucide-react';
 
-export type PatientStatus = 'Treating' | 'Waiting' | 'Discharged';
+export type PatientStatus = 'Treating' | 'Waiting' | 'Discharged' | 'All';
 
 export type PatientRecord = {
   id: string;
@@ -55,23 +55,27 @@ const PatientsPage = () => {
 
   const [patients, setPatients] = useState<PatientRecord[]>(samplePatients);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<PatientStatus | 'All'>('All');
 
   const [name, setName] = useState('');
   const [department, setDepartment] = useState('');
-  const [status, setStatus] = useState<PatientStatus>('Waiting');
+  const [status, setStatus] = useState<PatientStatus>('All');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [selectedPatient, setSelectedPatient] = useState<PatientRecord | null>(null);
 
-  // Filter patients based on search term
+  // Filter patients based on search term and status filter
   const filteredPatients = patients.filter(patient => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      patient.name.toLowerCase().includes(searchLower) ||
-      patient.department.toLowerCase().includes(searchLower) ||
-      patient.status.toLowerCase().includes(searchLower) ||
+    const matchesSearch = searchTerm === '' || 
+      patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.date.includes(searchTerm) ||
-      patient.time.toLowerCase().includes(searchLower)
-    );
+      patient.time.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'All' || patient.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
   });
 
   const addPatient = (e: React.FormEvent) => {
@@ -98,8 +102,102 @@ const PatientsPage = () => {
   const waiting = patients.filter(p => p.status === 'Waiting').length;
   const discharged = patients.filter(p => p.status === 'Discharged').length;
 
+  // Open patient details modal
+  const openPatientDetails = (patient: PatientRecord) => {
+    setSelectedPatient(patient);
+  };
+
+  // Close patient details modal
+  const closePatientDetails = () => {
+    setSelectedPatient(null);
+  };
+
+  // Patient Details Modal
+  const PatientDetailsModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+        <div className="p-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">{selectedPatient?.name}</h2>
+              <div className="flex items-center mt-1">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  selectedPatient?.status === 'Waiting' ? 'bg-yellow-100 text-yellow-800' :
+                  selectedPatient?.status === 'Treating' ? 'bg-blue-100 text-blue-800' :
+                  'bg-green-100 text-green-800'
+                }`}>
+                  {selectedPatient?.status}
+                </span>
+              </div>
+            </div>
+            <button 
+              onClick={closePatientDetails}
+              className="text-gray-400 hover:text-gray-500"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          
+          <div className="mt-6 space-y-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <User className="h-5 w-5" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-sm font-medium text-gray-500">Patient Name</h3>
+                <p className="text-sm text-gray-900">{selectedPatient?.name}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <Stethoscope className="h-5 w-5" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-sm font-medium text-gray-500">Department</h3>
+                <p className="text-sm text-gray-900">{selectedPatient?.department}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <StatusIcon className="h-5 w-5" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                <p className="text-sm text-gray-900">{selectedPatient?.status}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-sm font-medium text-gray-500">Date</h3>
+                <p className="text-sm text-gray-900">{selectedPatient?.date}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <Clock className="h-5 w-5" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-sm font-medium text-gray-500">Time</h3>
+                <p className="text-sm text-gray-900">{selectedPatient?.time}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+      {selectedPatient && <PatientDetailsModal />}
       <div className="p-4 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="inline-flex p-2 rounded-lg bg-blue-50 text-blue-600">
@@ -140,8 +238,9 @@ const PatientsPage = () => {
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
         <input value={department} onChange={(e) => setDepartment(e.target.value)} placeholder="Department" className="px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
         <select value={status} onChange={(e) => setStatus(e.target.value as PatientStatus)} className="px-3 py-2 border rounded-md bg-white">
-          <option value="Treating">Treating</option>
+          <option value="All">All Status</option>
           <option value="Waiting">Waiting</option>
+          <option value="Treating">Treating</option>
           <option value="Discharged">Discharged</option>
         </select>
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="px-3 py-2 border rounded-md" />
@@ -154,32 +253,38 @@ const PatientsPage = () => {
         </button>
       </form>
 
-      {/* Search Bar */}
+      {/* Search and Filter Bar */}
       <div className="px-4 pb-2">
-        <div className="relative max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search patients by name, department, status..."
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => setSearchTerm('')}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            >
-              <svg className="h-5 w-5 text-gray-400 hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+        <div className="flex flex-wrap gap-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
               </svg>
-            </button>
-          )}
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search patients..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          
+          <div className="min-w-[180px]">
+            <label htmlFor="status-filter" className="sr-only">Filter by status</label>
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as PatientStatus | 'All')}
+              className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option value="All">All Status</option>
+              <option value="Waiting">Waiting</option>
+              <option value="Treating">Treating</option>
+              <option value="Discharged">Discharged</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -216,7 +321,11 @@ const PatientsPage = () => {
               </tr>
             ) : (
               filteredPatients.map((p, idx) => (
-              <tr key={p.id} className="text-sm text-gray-800 transition-colors duration-150 hover:bg-blue-50/30 cursor-pointer">
+              <tr 
+                key={p.id} 
+                className="text-sm text-gray-800 transition-colors duration-150 hover:bg-blue-50/30 cursor-pointer"
+                onClick={() => openPatientDetails(p)}
+              >
                 <td className={`py-3 pr-4 ${idx !== patients.length - 1 ? 'border-b border-gray-100' : ''}`}>
                   <div className="font-medium">{p.name}</div>
                 </td>

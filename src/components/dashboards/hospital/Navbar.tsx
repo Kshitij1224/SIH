@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [activeLink, setActiveLink] = useState('');
 
@@ -49,7 +51,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-5 md:px-6">
+      <div className="max-w-8xl mx-auto px-5 md:px-6">
         <div className="relative flex items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -167,7 +169,12 @@ const Navbar = () => {
                   </a>
                   <button
                     className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => alert('Signed out')}
+                    onClick={() => {
+                      // Clear any user data from localStorage
+                      localStorage.removeItem('user');
+                      // Redirect to the main loading page
+                      window.location.href = '/';
+                    }}
                   >
                     <span>Sign out</span>
                   </button>

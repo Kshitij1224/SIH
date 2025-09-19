@@ -102,17 +102,14 @@ const DoctorDetails = ({ doctor, onClose }: { doctor: DoctorRecord | null, onClo
             </div>
           </div>
           
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+          <div className="mt-6">
             <a 
               href="tel:+911234567890" 
-              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               <Phone className="w-4 h-4 mr-2" />
               Call Now
             </a>
-            <button className="px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors">
-              Book Appointment
-            </button>
           </div>
         </div>
       </div>

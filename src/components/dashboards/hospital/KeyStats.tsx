@@ -53,40 +53,40 @@ const KeyStats = () => {
     {
       title: 'Admissions',
       value: '124',
-      subtitle: 'Today',
+      subtitle: 'New patients admitted today',
       icon: UserPlus,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-blue-100/80',
       trend: '+12%',
       trendColor: 'text-green-600',
     },
     {
       title: 'Discharges',
       value: '98',
-      subtitle: 'Today',
+      subtitle: 'Patients discharged today',
       icon: UserMinus,
       color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      bgColor: 'bg-green-100/80',
       trend: '+8%',
       trendColor: 'text-green-600',
     },
     {
       title: 'Bed Occupancy',
       value: '85%',
-      subtitle: 'Available: 24 beds',
+      subtitle: '24 beds available across all wards',
       icon: Bed,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-100/80',
       trend: '↑ 5%',
-      trendColor: 'text-orange-600',
+      trendColor: 'text-amber-600',
     },
     {
       title: 'ER Wait Time',
       value: '2h 15m',
-      subtitle: 'Current Average',
+      subtitle: 'Current average wait time in ER',
       icon: Clock,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      color: 'text-rose-600',
+      bgColor: 'bg-rose-100/80',
       trend: '↓ 30min',
       trendColor: 'text-green-600',
     },
@@ -95,62 +95,130 @@ const KeyStats = () => {
       value: '312 units',
       subtitle: 'O+: 120 • A+: 95 • B+: 62',
       icon: Droplet,
-      color: 'text-rose-600',
-      bgColor: 'bg-rose-50',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100/80',
       trend: '+4%',
       trendColor: 'text-green-600',
     },
     {
       title: 'Ambulance',
       value: '8 Active',
-      subtitle: 'Total: 12 • On Duty: 10',
+      subtitle: '10 on duty • 2 in maintenance',
       icon: Ambulance,
       color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
+      bgColor: 'bg-indigo-100/80',
       trend: '2 standby',
       trendColor: 'text-indigo-600',
     },
   ];
 
+  // Function to get gradient colors based on card type
+  const getCardGradient = (title: string) => {
+    switch(title) {
+      case 'Admissions': return 'from-blue-50 to-blue-100';
+      case 'Discharges': return 'from-green-50 to-green-100';
+      case 'Bed Occupancy': return 'from-amber-50 to-amber-100';
+      case 'ER Wait Time': return 'from-rose-50 to-rose-100';
+      case 'Blood Bank': return 'from-purple-50 to-purple-100';
+      case 'Ambulance': return 'from-indigo-50 to-indigo-100';
+      default: return 'from-gray-50 to-gray-100';
+    }
+  };
+
   return (
-    <section className="mb-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Hospital Overview</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <section className="mb-12">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900">Hospital Overview</h2>
+        <p className="text-gray-500 mt-2">Key metrics at a glance</p>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
+          const gradient = getCardGradient(stat.title);
+          
           return (
             <div
               key={index}
-              className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300 ${
-                stat.title === 'Admissions' || stat.title === 'Discharges' || stat.title === 'Bed Occupancy' || stat.title === 'Blood Bank' || stat.title === 'Ambulance' ? 'cursor-pointer hover:border-blue-200' : ''
-              }`}
+              className={`group relative overflow-hidden rounded-2xl p-5 transition-all duration-300 ease-in-out
+                bg-gradient-to-br ${gradient} border border-opacity-30 border-white shadow-md
+                hover:shadow-lg hover:-translate-y-1 h-full flex flex-col
+                ${['Admissions', 'Discharges', 'Bed Occupancy', 'Blood Bank', 'Ambulance'].includes(stat.title) 
+                  ? 'cursor-pointer' 
+                  : ''}`}
               onClick={
-                stat.title === 'Admissions'
-                  ? () => setShowAdmissions(true)
-                  : stat.title === 'Discharges'
-                  ? () => setShowDischarges(true)
-                  : stat.title === 'Bed Occupancy'
-                  ? () => setShowBedOccupancy(true)
-                  : stat.title === 'Blood Bank'
-                  ? () => setShowBloodBank(true)
-                  : stat.title === 'Ambulance'
-                  ? () => setShowAmbulance(true)
-                  : undefined
+                stat.title === 'Admissions' ? () => setShowAdmissions(true) :
+                stat.title === 'Discharges' ? () => setShowDischarges(true) :
+                stat.title === 'Bed Occupancy' ? () => setShowBedOccupancy(true) :
+                stat.title === 'Blood Bank' ? () => setShowBloodBank(true) :
+                stat.title === 'Ambulance' ? () => setShowAmbulance(true) :
+                undefined
               }
-              role={stat.title === 'Admissions' || stat.title === 'Discharges' || stat.title === 'Bed Occupancy' || stat.title === 'Blood Bank' || stat.title === 'Ambulance' ? 'button' : undefined}
-              tabIndex={stat.title === 'Admissions' || stat.title === 'Discharges' || stat.title === 'Bed Occupancy' || stat.title === 'Blood Bank' || stat.title === 'Ambulance' ? 0 : undefined}
+              role={['Admissions', 'Discharges', 'Bed Occupancy', 'Blood Bank', 'Ambulance'].includes(stat.title) ? 'button' : undefined}
+              tabIndex={['Admissions', 'Discharges', 'Bed Occupancy', 'Blood Bank', 'Ambulance'].includes(stat.title) ? 0 : undefined}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (stat.title === 'Admissions') setShowAdmissions(true);
+                  else if (stat.title === 'Discharges') setShowDischarges(true);
+                  else if (stat.title === 'Bed Occupancy') setShowBedOccupancy(true);
+                  else if (stat.title === 'Blood Bank') setShowBloodBank(true);
+                  else if (stat.title === 'Ambulance') setShowAmbulance(true);
+                }
+              }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <Icon className={`w-6 h-6 ${stat.color}`} />
-                </div>
-                <span className={`text-sm font-medium ${stat.trendColor}`}>
-                  {stat.trend}
-                </span>
+              {/* Decorative elements */}
+              <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-10" 
+                   style={{ background: `radial-gradient(circle, ${stat.color.replace('text-', '')} 0%, transparent 70%)` }}>
               </div>
-              <h3 className="text-sm font-medium text-gray-600 mb-2">{stat.title}</h3>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</p>
-              <p className="text-sm text-gray-500">{stat.subtitle}</p>
+              
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 flex-1 flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  {/* Icon with animated background */}
+                  <div className={`p-2.5 rounded-lg ${stat.bgColor} shadow-inner 
+                                transition-all duration-300 group-hover:scale-110`}>
+                    <Icon className={`w-5 h-5 ${stat.color} transition-transform duration-300`} />
+                  </div>
+                  
+                  {/* Trend indicator */}
+                  <span className={`text-xs font-medium ${stat.trendColor} bg-white/90 px-2 py-1 rounded-full 
+                                 shadow-sm transition-all duration-200`}>
+                    {stat.trend}
+                  </span>
+                </div>
+                
+                {/* Main content */}
+                <div className="mt-1">
+                  <h3 className="text-sm font-medium text-gray-700">
+                    {stat.title}
+                  </h3>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {stat.subtitle}
+                  </p>
+                </div>
+                
+                {/* View details link */}
+                {['Admissions', 'Discharges', 'Bed Occupancy', 'Blood Bank', 'Ambulance'].includes(stat.title) && (
+                  <div className="mt-auto pt-3 -mb-1">
+                    <span className="inline-flex items-center text-xs font-medium text-blue-600 group-hover:text-blue-800 
+                                transition-colors duration-200">
+                      View details
+                      <svg className="w-3 h-3 ml-1" 
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24" 
+                           xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}

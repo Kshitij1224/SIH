@@ -88,7 +88,10 @@ const DataTables = () => {
               Doctor Activity
             </h3>
             <button
-              onClick={() => { window.location.hash = '#/doctor-activity'; }}
+              onClick={() => { 
+                window.location.hash = '#/doctor-activity';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               className="px-3 py-1.5 text-sm font-medium rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"
             >
               View More

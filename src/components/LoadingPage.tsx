@@ -31,7 +31,7 @@ const LoadingPage: React.FC<LoadingPageProps> = ({
   progress: externalProgress,
   message = 'Loading...',
   subtitle = 'Please wait while we prepare your experience',
-  duration = 3,
+  duration = 1,
 }) => {
   const [progress, setProgress] = useState(0);
 
