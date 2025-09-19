@@ -7,6 +7,7 @@ const resources = {
   en: {
     translation: {
       // Navigation
+      'nav.home': 'Home',
       'nav.governmentSchemes': 'Government Schemes',
       'nav.aiChatbot': 'AI Chatbot',
       'nav.telemedicine': 'Telemedicine',
@@ -35,6 +36,7 @@ const resources = {
   hi: {
     translation: {
       // Navigation
+      'nav.home': 'होम',
       'nav.governmentSchemes': 'सरकारी योजनाएं',
       'nav.aiChatbot': 'एआई चैटबॉट',
       'nav.telemedicine': 'टेलीमेडिसिन',

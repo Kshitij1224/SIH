@@ -11,18 +11,33 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { User, Stethoscope, Building2, ArrowLeft } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialUserType?: string | null;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
-  const [selectedUserType, setSelectedUserType] = useState<string | null>(null);
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen: isOpenProp, onClose, initialUserType = null }) => {
+  const [selectedUserType, setSelectedUserType] = useState<string | null>(initialUserType);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isOpen, setIsOpen] = useState(isOpenProp);
+
+  // Reset form when modal is opened/closed
+  React.useEffect(() => {
+    if (isOpen !== isOpenProp) {
+      setIsOpen(isOpenProp);
+      if (isOpenProp) {
+        // Use the initialUserType if provided, otherwise reset to null
+        setSelectedUserType(initialUserType);
+        setEmail('');
+        setPassword('');
+      }
+    }
+  }, [isOpenProp, initialUserType]);
 
   const userTypes = [
     {
@@ -52,12 +67,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
 
   const handleLogin = () => {
+    if (!selectedUserType) {
+      // Shouldn't happen as we require user type selection first
+      console.error('No user type selected');
+      return;
+    }
     // In a real app, you would validate the credentials first
     login(email, password, selectedUserType as any);
     onClose();
   };
 
   const handleRegister = () => {
+    if (!selectedUserType) {
+      // Shouldn't happen as we require user type selection first
+      console.error('No user type selected');
+      return;
+    }
     // In a real app, you would handle registration here
     console.log(`Registration for ${selectedUserType}`);
     // After successful registration, you might want to automatically log the user in
@@ -65,12 +90,30 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     onClose();
   };
 
+  const handleBack = () => {
+    setSelectedUserType(null);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) onClose();
+      setIsOpen(open);
+    }}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
-            {selectedUserType ? t(`userType.${selectedUserType}`) + ' ' + t('login.loginButton') : t('login.chooseType')}
+            {selectedUserType ? (
+              <div className="flex items-center justify-center space-x-2">
+                <button 
+                  onClick={handleBack}
+                  className="p-1 rounded-full hover:bg-gray-100 mr-2"
+                  aria-label="Back to user type selection"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <span>{t(`userType.${selectedUserType}`)} {t('login.loginButton')}</span>
+              </div>
+            ) : t('login.chooseType')}
           </DialogTitle>
           <DialogDescription className="text-center">
             {selectedUserType ? t('login.enterCredentials') : 'Select your user type to proceed'}

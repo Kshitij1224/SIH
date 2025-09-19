@@ -1,0 +1,104 @@
+{
+  "doctors": [
+    {
+      "id": "doc1",
+      "name": "Dr. Sarah Johnson",
+      "email": "sarah.johnson@example.com",
+      "password": "doctor123",
+      "specialization": "Cardiologist",
+      "hospital": "City General Hospital",
+      "phone": "+1 (555) 123-4567",
+      "address": "123 Medical Drive, Suite 100, New York, NY 10001"
+    },
+    {
+      "id": "doc2",
+      "name": "Dr. Michael Chen",
+      "email": "michael.chen@example.com",
+      "password": "doctor123",
+      "specialization": "Neurologist",
+      "hospital": "Metro Health Center",
+      "phone": "+1 (555) 234-5678",
+      "address": "456 Brain Street, Suite 200, Boston, MA 02108"
+    },
+    {
+      "id": "doc3",
+      "name": "Dr. Emily Wilson",
+      "email": "emily.wilson@example.com",
+      "password": "doctor123",
+      "specialization": "Pediatrician",
+      "hospital": "Children's Care Hospital",
+      "phone": "+1 (555) 345-6789",
+      "address": "789 Kids Avenue, Suite 300, Chicago, IL 60601"
+    }
+  ],
+  "patients": [
+    {
+      "id": "pat1",
+      "name": "John Smith",
+      "email": "john.smith@example.com",
+      "password": "patient123",
+      "age": 42,
+      "gender": "Male",
+      "bloodType": "A+",
+      "phone": "+1 (555) 987-6543",
+      "emergencyContact": "+1 (555) 987-6544"
+    },
+    {
+      "id": "pat2",
+      "name": "Maria Garcia",
+      "email": "maria.garcia@example.com",
+      "password": "patient123",
+      "age": 35,
+      "gender": "Female",
+      "bloodType": "O-",
+      "phone": "+1 (555) 876-5432",
+      "emergencyContact": "+1 (555) 876-5433"
+    },
+    {
+      "id": "pat3",
+      "name": "David Kim",
+      "email": "david.kim@example.com",
+      "password": "patient123",
+      "age": 28,
+      "gender": "Male",
+      "bloodType": "B+",
+      "phone": "+1 (555) 765-4321",
+      "emergencyContact": "+1 (555) 765-4322"
+    }
+  ],
+  "hospitals": [
+    {
+      "id": "hosp1",
+      "name": "City General Hospital",
+      "email": "admin@citygeneral.com",
+      "password": "hospital123",
+      "address": "123 Medical Drive, New York, NY 10001",
+      "phone": "+1 (212) 555-1000",
+      "departments": ["Cardiology", "Neurology", "Pediatrics", "Surgery"],
+      "beds": 500,
+      "doctors": 120
+    },
+    {
+      "id": "hosp2",
+      "name": "Metro Health Center",
+      "email": "admin@metrohealth.com",
+      "password": "hospital123",
+      "address": "456 Health Avenue, Boston, MA 02108",
+      "phone": "+1 (617) 555-2000",
+      "departments": ["Neurology", "Orthopedics", "Radiology", "Emergency"],
+      "beds": 350,
+      "doctors": 85
+    },
+    {
+      "id": "hosp3",
+      "name": "Children's Care Hospital",
+      "email": "admin@childrenscare.com",
+      "password": "hospital123",
+      "address": "789 Kids Street, Chicago, IL 60601",
+      "phone": "+1 (312) 555-3000",
+      "departments": ["Pediatrics", "Neonatology", "Pediatric Surgery", "Child Psychology"],
+      "beds": 200,
+      "doctors": 65
+    }
+  ]
+}

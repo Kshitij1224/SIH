@@ -2,16 +2,17 @@ import React, { useState, Suspense } from 'react';
 import './i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './components/contexts/AuthContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import HeartAnimation from './components/HeartAnimation';
 import Navigation from './components/Navigation';
-import MarqueeSection from './components/MarqueeSection';
+import BlurText from './components/BlurText';
 import GovernmentSchemes from './components/GovernmentSchemes';
+import WhatWeOffer from './components/WhatWeOffer';
 import LoginModal from './components/LoginModal';
 import AIChatbot from './components/AIChatbot';
 import Telemedicine from './components/Telemedicine';
 import VideoSection from './components/VideoSection';
-import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import PatientDashboard from './components/dashboards/PatientDashboard';
 import DoctorDashboard from './components/dashboards/DoctorDashboard';
@@ -24,24 +25,45 @@ const AppContent = () => {
   const { isAuthenticated } = useAuth();
 
   const handleLandingComplete = () => {
-    setShowLanding(false);
+    // Add a small delay to ensure the loading animation completes
+    setTimeout(() => {
+      setShowLanding(false);
+    }, 300);
   };
 
   return (
     <div className="min-h-screen">
       <AnimatePresence mode="wait">
         {showLanding ? (
-          <HeartAnimation key="landing" onComplete={handleLandingComplete} />
+          <motion.div
+            key="landing"
+            initial={{ opacity: 1 }}
+            exit={{ 
+              opacity: 0,
+              transition: { 
+                duration: 0.5,
+                ease: "easeInOut"
+              } 
+            }}
+          >
+            <HeartAnimation onComplete={handleLandingComplete} />
+          </motion.div>
         ) : (
           <motion.div
             key="main"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="min-h-screen"
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: 1,
+              transition: { 
+                duration: 0.8, 
+                ease: "easeInOut",
+                delay: 0.2
+              } 
+            }}
+            className="min-h-screen bg-white"
           >
             <Navigation onLoginClick={() => setShowLoginModal(true)} />
-            <MarqueeSection />
+            
             
             <main className="relative">
               {/* Hero Section */}
@@ -49,38 +71,73 @@ const AppContent = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="pt-32 pb-20 bg-gradient-to-br from-blue-50 to-teal-50"
+                className="relative h-screen flex items-center justify-center overflow-hidden"
+                style={{ marginTop: '72px' }}
               >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                  <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                    Welcome to <span className="text-blue-600">MedX</span>
-                  </h1>
-                  <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                    Your comprehensive healthcare platform offering AI-powered assistance, 
-                    telemedicine services, and access to government health schemes.
+                {/* Video Background */}
+                <div className="absolute inset-0 w-full h-full">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                  >
+                    <source src="/src/assets/main .mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/80 to-teal-600/80"></div>
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                
+                  <div className="text-5xl md:text-6xl font-bold text-white mb-6 flex items-center justify-center gap-2">
+                    <BlurText
+                      text="Welcome To"
+                      animateBy="words"
+                      delay={500}
+                      direction="top"
+                      className="inline"
+                      onAnimationComplete={() => console.log('Welcome animation completed!')}
+                    />
+                    <BlurText
+                      text="MedX"
+                      animateBy="letters"
+                      delay={510}
+                      direction="top"
+                      className="text-white"
+                      animationFrom={{ filter: 'blur(10px)', opacity: 0, y: -30 }}
+                      animationTo={[
+                        { filter: 'blur(5px)', opacity: 0.9, y: 5 },
+                        { filter: 'blur(0px)', opacity: 1, y: 0 }
+                      ]}
+                    />
+                  </div>
+                  <p className="text-xl md:text-xl text-gray-200 mt-10 mb-8 max-w-3xl mx-auto">
+                  MedX is a unified digital healthcare platform integrating electronic health records, AI diagnostics, doctor discovery, and telemedicine, delivering trusted, inclusive, and accessible healthcare solutions for patients, doctors, and hospitals across India.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
-                      onClick={() => document.getElementById('ai-chatbot')?.scrollIntoView({ behavior: 'smooth' })}
+                      onClick={() => document.getElementById('telemedicine')?.scrollIntoView({ behavior: 'smooth' })}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors transform hover:scale-105 duration-200"
                     >
-                      Try AI Assistant
+                      Telemedicine
                     </button>
                     <button
-                      onClick={() => document.getElementById('government-schemes')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 duration-200"
+                      onClick={() => document.getElementById('ai-chatbot')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="border-2 border-white text-white hover:bg-blue-600 hover:border-blue-600 px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 duration-200"
                     >
-                      Explore Schemes
+                      Try AI Assistant
                     </button>
                   </div>
                 </div>
               </motion.section>
-
+              <WhatWeOffer />
               <GovernmentSchemes />
+              
               <AIChatbot />
               <Telemedicine />
               <VideoSection />
-              <FAQ />
             </main>
 
             <Footer />
@@ -101,7 +158,8 @@ function App() {
     <Suspense fallback="Loading...">
       <Router>
         <AuthProvider>
-        <Routes>
+          <SettingsProvider>
+            <Routes>
           <Route path="/" element={<AppContent />} />
           <Route path="/login" element={<Navigate to="/" />} />
           
@@ -132,8 +190,9 @@ function App() {
           />
           
           {/* Fallback route */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </SettingsProvider>
         </AuthProvider>
       </Router>
     </Suspense>

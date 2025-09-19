@@ -1,49 +1,32 @@
+import React from 'react';
+import Navbar from './patient/Navbar';
+import HealthOverview from './patient/HealthOverview';
+import Services from './patient/Services';
+import MedicalImaging from './patient/MedicalImaging';
+import AppointmentsMedications from './patient/AppointmentsMedications';
+import Initiatives from './patient/Initiatives';
+import Footer from './patient/Footer';
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/card';
-import { User } from 'lucide-react';
-
-const PatientDashboard = () => {
+const PatientDashboard: React.FC = () => {
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Patient Dashboard</h1>
-        <div className="flex items-center space-x-2">
-          <User className="h-6 w-6" />
-          <span>Welcome, Patient</span>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Appointments</CardTitle>
-            <CardDescription>Your next medical appointments</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>No upcoming appointments</p>
-          </CardContent>
-        </Card>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, John!</h1>
+          <p className="text-gray-600">Here's your health overview for today</p>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Medical Records</CardTitle>
-            <CardDescription>View your health history</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Recent records will appear here</p>
-          </CardContent>
-        </Card>
+        <HealthOverview />
+        <Services />
+        <MedicalImaging />
+        <AppointmentsMedications />
+        <Initiatives />
+      </main>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Prescriptions</CardTitle>
-            <CardDescription>Your current medications</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>No active prescriptions</p>
-          </CardContent>
-        </Card>
-      </div>
+      <Footer />
     </div>
   );
 };

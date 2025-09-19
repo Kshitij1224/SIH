@@ -16,7 +16,7 @@ const AIChatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello! I'm MedX AI Assistant. How can I help you with your health concerns today?",
+      text: "Hello! I'm Happiny - MedX AI Assistant. How can I help you with your health concerns today?",
       sender: 'bot',
       timestamp: new Date()
     }
@@ -86,7 +86,7 @@ const AIChatbot: React.FC = () => {
             <CardHeader className="border-b">
               <CardTitle className="flex items-center space-x-2">
                 <Bot className="w-6 h-6 text-blue-600" />
-                <span>MedX AI Assistant</span>
+                <span>Happiny</span>
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse ml-2"></div>
               </CardTitle>
             </CardHeader>
