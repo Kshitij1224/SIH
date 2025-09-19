@@ -4,12 +4,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const Initiatives = () => {
   const initiatives = [
     {
-      name: 'UNESCO',
-      // Place the user's provided image at public/initiatives/unesco.jpg
-      image: '/initiatives/unesco.jpg',
-      title: 'Global Health Education Initiative',
-      description: 'Promoting health literacy worldwide',
-      sourceUrl: 'https://www.unesco.org/en/health-education',
+      name: 'UNAIDS',
+      // Place the user's provided image at public/initiatives/unaids.jpg
+      image: '/initiatives/unaids.jpg',
+      title: 'Ending AIDS as a public health threat',
+      description: 'Global leadership and advocacy to end AIDS and ensure health for all',
+      sourceUrl: 'https://www.unaids.org/',
     },
     {
       name: 'WHO',
@@ -23,7 +23,7 @@ const Initiatives = () => {
       image: '/initiatives/unicef.jpg',
       title: 'Child Health Program',
       description: 'Protecting children\'s health globally',
-      sourceUrl: 'https://www.unicef.org/health',
+      sourceUrl: 'https://www.unicef.org/sites/default/files/styles/media_large_image/public/UNI408835.jpg.webp?itok=gqrnI2qJ',
     },
     {
       name: 'Red Cross',
@@ -48,7 +48,7 @@ const Initiatives = () => {
     <section className="mb-8">
       <div className="text-center mb-2">
         <h2 className="text-2xl font-bold text-gray-900">Health Initiatives</h2>
-        <p className="text-gray-600">Explore impactful programs from UNESCO, WHO, UNICEF and more</p>
+        <p className="text-gray-600">Explore impactful programs from UNAIDS, WHO, UNICEF and more</p>
       </div>
 
       {/* Carousel */}
@@ -61,20 +61,20 @@ const Initiatives = () => {
           >
             {initiatives.map((item, i) => (
               <div key={i} className="min-w-full">
-                <div className="relative bg-black/5">
+                <div className="relative bg-black/5 h-[28rem] md:h-[34rem] overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.name}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-80 md:h-96 object-cover"
+                    className="w-full h-full object-cover object-center"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       // Fallbacks if local images aren't present yet
                       const fallbacks: Record<string, string> = {
-                        UNESCO: 'https://images.pexels.com/photos/3184431/pexels-photo-3184431.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=1',
+                        UNAIDS: 'https://www.unaids.org/sites/default/files/2024-07/GLOBAL_AIDS_UPDATE_2024_en.jpg',
                         WHO: 'https://images.pexels.com/photos/7469239/pexels-photo-7469239.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=1',
-                        UNICEF: 'https://images.pexels.com/photos/8460340/pexels-photo-8460340.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=1',
+                        UNICEF: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.unicef.org%2Fimmunization&psig=AOvVaw1V83zg5kL0dy52q1v5duKl&ust=1758366479727000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLD35-TX5I8DFQAAAAAdAAAAABAE',
                         'Red Cross': 'https://images.pexels.com/photos/8460092/pexels-photo-8460092.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=1',
                       };
                       const name = (e.currentTarget.alt || '').trim();

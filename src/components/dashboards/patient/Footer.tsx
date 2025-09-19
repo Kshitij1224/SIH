@@ -1,60 +1,69 @@
 import React from 'react';
-import { Phone } from 'lucide-react';
+import { Heart, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 
-const Footer = () => {
+const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 mt-12">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Company Info */}
-          <div>
-            <div className="flex items-center mb-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-lg">M</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">MedX</span>
+    <footer className="bg-gray-900 text-white py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-4 gap-8">
+          <div className="col-span-1">
+            <div className="flex items-center space-x-2 mb-4">
+              <Heart className="w-8 h-8 text-blue-400" fill="currentColor" />
+              <span className="text-2xl font-bold">MedX</span>
             </div>
-            <p className="text-gray-600 text-sm">
-              Your trusted healthcare companion for better health management.
+            <p className="text-gray-400 mb-4">
+              Your trusted healthcare partner, providing accessible medical services and health information for all.
             </p>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
-            <div className="space-y-2">
-              <a href="#" className="block text-gray-600 hover:text-blue-600 text-sm transition-colors">
-                About Us
-              </a>
-              <a href="#" className="block text-gray-600 hover:text-blue-600 text-sm transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="block text-gray-600 hover:text-blue-600 text-sm transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="block text-gray-600 hover:text-blue-600 text-sm transition-colors">
-                Contact
-              </a>
+            <div className="flex space-x-4">
+              <Facebook className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+              <Twitter className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+              <Instagram className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+              <Linkedin className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
             </div>
           </div>
 
-          {/* Emergency Contact */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Emergency</h3>
-            <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <Phone className="w-5 h-5 text-red-600" />
-              <div>
-                <p className="text-sm font-medium text-red-800">Emergency Helpline</p>
-                <p className="text-lg font-bold text-red-600">911</p>
+          <div className="col-span-1">
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-gray-400">
+              <li><a href="#government-schemes" className="hover:text-white transition-colors">Government Schemes</a></li>
+              <li><a href="#ai-chatbot" className="hover:text-white transition-colors">AI Chatbot</a></li>
+              <li><a href="#telemedicine" className="hover:text-white transition-colors">Telemedicine</a></li>
+              <li><a href="#videos" className="hover:text-white transition-colors">Health Videos</a></li>
+              
+            </ul>
+          </div>
+
+          <div className="col-span-1">
+            <h3 className="text-lg font-semibold mb-4">Services</h3>
+            <ul className="space-y-2 text-gray-400">
+              <li>Online Consultations</li>
+              <li>Health Check-ups</li>
+              <li>Emergency Services</li>
+              <li>Health Insurance</li>
+            </ul>
+          </div>
+
+          <div className="col-span-1">
+            <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
+            <div className="space-y-3 text-gray-400">
+              <div className="flex items-center space-x-3">
+                <Phone className="w-4 h-4" />
+                <span>777-888-999</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Mail className="w-4 h-4" />
+                <span>support@medx.com</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <MapPin className="w-4 h-4" />
+                <span>123 Industrial Area, New Delhi</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-8 pt-6">
-          <p className="text-center text-gray-500 text-sm">
-            © 2025 MedX. All rights reserved.
-          </p>
+        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+          <p>&copy; 2025 MedX. All rights reserved. | Privacy Policy | Terms of Service</p>
         </div>
       </div>
     </footer>

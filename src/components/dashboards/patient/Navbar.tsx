@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Bell, User, ChevronDown, X, Calendar, Clock, MapPin, MessageCircle, Send, Bot } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
+  const { logout } = useAuth();
   // Language selector state
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<{ code: string; name: string; flag: string }>({ code: 'en', name: 'English', flag: '🇺🇸' });
@@ -23,9 +25,9 @@ const Navbar = () => {
   type ChatMsg = { id: string; sender: 'user' | 'bot'; text: string; time: string };
   type Doctor = { id: string; name: string; specialty: string; avatar: string };
   const doctors: Doctor[] = [
-    { id: 'd1', name: 'Dr. Sarah Smith', specialty: 'Cardiologist', avatar: 'https://images.pexels.com/photos/5327656/pexels-photo-5327656.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&dpr=1' },
+    { id: 'd1', name: 'Dr. Sarah Smith', specialty: 'Cardiologist', avatar: 'https://randomuser.me/api/portraits/women/12.jpg' },
     { id: 'd2', name: 'Dr. Michael Johnson', specialty: 'Neurologist', avatar: 'https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&dpr=1' },
-    { id: 'd3', name: 'Dr. Neha Mishra', specialty: 'General Physician', avatar: 'https://images.pexels.com/photos/6234583/pexels-photo-6234583.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&dpr=1' },
+    { id: 'd3', name: 'Dr. Neha Mishra', specialty: 'General Physician', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
   ];
   const [activeDoctorId, setActiveDoctorId] = useState<string>(doctors[0].id);
   const initialWelcome = () => ({ id: `c-${Date.now()}`, sender: 'bot' as const, text: 'Hello, how can I assist you today?', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
@@ -36,6 +38,8 @@ const Navbar = () => {
   });
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [doctorSearch, setDoctorSearch] = useState('');
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const sendChat = () => {
     const text = chatInput.trim();
@@ -81,7 +85,7 @@ const Navbar = () => {
       items.push({
         id: `n-chat-${latestChat.id}`,
         kind: 'chat',
-        title: latestChat.sender === 'user' ? 'You sent a message' : 'New reply from assistant',
+        title: latestChat.sender === 'user' ? 'You sent a message' : 'New reply from doctor',
         detail: latestChat.text.length > 60 ? latestChat.text.slice(0,60)+'…' : latestChat.text,
         time: latestChat.time,
       });
@@ -143,6 +147,12 @@ const Navbar = () => {
     return { past, today, future };
   };
 
+  const filteredDoctors = doctors.filter((d) => {
+    const q = doctorSearch.trim().toLowerCase();
+    if (!q) return true;
+    return d.name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q);
+  });
+
   return (
     <>
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -174,7 +184,7 @@ const Navbar = () => {
               <a href="#" className="text-blue-600 font-medium px-3 py-2 rounded-md bg-blue-50">Home</a>
               <button onClick={() => setShowApptsModal(true)} className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">Appointments</button>
               <a href="#" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">AI Chatbot</a>
-              <button onClick={() => window.open('/records.html','_blank')} className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">Records</button>
+              <button onClick={() => { window.location.href = '/record.html'; }} className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">Records</button>
               <button onClick={() => setShowChatModal(true)} className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">Chat</button>
             </div>
           </div>
@@ -222,7 +232,7 @@ const Navbar = () => {
               <div className="p-2 bg-white/20 rounded-lg">
                 <MessageCircle className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold">Chat Assistant</h3>
+              <h3 className="text-lg font-semibold">Chat</h3>
             </div>
             <button aria-label="Close" onClick={() => setShowChatModal(false)} className="absolute right-3 top-3 p-2 rounded-md hover:bg-white/10">
               <X className="w-5 h-5 text-white" />
@@ -234,8 +244,19 @@ const Navbar = () => {
             {/* Sidebar: doctors */}
             <aside className="w-56 border-r border-gray-200 bg-white">
               <div className="px-4 py-3 text-xs font-semibold text-gray-500">Doctors</div>
-              <ul className="max-h-[60vh] overflow-y-auto">
-                {doctors.map((d) => (
+              <div className="px-4 pb-2">
+                <input
+                  value={doctorSearch}
+                  onChange={(e) => setDoctorSearch(e.target.value)}
+                  placeholder="Search doctors..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <ul className="max-h-[75vh] overflow-y-auto">
+                {filteredDoctors.length === 0 && (
+                  <li className="px-4 py-3 text-sm text-gray-500">No doctors found</li>
+                )}
+                {filteredDoctors.map((d) => (
                   <li key={d.id}>
                     <button
                       onClick={() => setActiveDoctorId(d.id)}
@@ -254,7 +275,7 @@ const Navbar = () => {
 
             {/* Messages and input */}
             <section className="flex-1 flex flex-col">
-              <div className="p-4 max-h-[60vh] overflow-y-auto space-y-3 bg-gray-50">
+              <div className="p-4 max-h-[75vh] overflow-y-auto space-y-3 bg-gray-50">
                 {(chatsByDoctor[activeDoctorId] || []).map((m: ChatMsg) => (
                   <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[80%] rounded-2xl px-4 py-2 shadow-sm ${m.sender === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-white text-gray-900 rounded-bl-sm border border-gray-200'}`}>
@@ -264,8 +285,10 @@ const Navbar = () => {
                   </div>
                 ))}
                 {isTyping && (
-                  <div className="flex items-center gap-2 text-gray-500 text-sm">
-                    <Bot className="w-4 h-4" /> typing...
+                  <div className="flex justify-start">
+                    <div className="max-w-[60%] rounded-2xl px-4 py-2 bg-white text-gray-600 rounded-bl-sm border border-gray-200 shadow-sm">
+                      <div className="text-sm">Typing…</div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -273,7 +296,13 @@ const Navbar = () => {
               {/* Quick actions */}
               <div className="px-4 pt-3 pb-1 bg-white border-t border-gray-200 flex flex-wrap gap-2">
                 {['Book appointment','Show my reports','Find blood bank','Health tip'].map((q, i) => (
-                  <button key={i} onClick={() => { setChatInput(q); }} className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200">{q}</button>
+                  <button
+                    key={i}
+                    onClick={() => { setChatInput(q); setTimeout(() => sendChat(), 0); }}
+                    className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    {q}
+                  </button>
                 ))}
               </div>
 
@@ -287,7 +316,7 @@ const Navbar = () => {
                     placeholder={`Message ${doctors.find(d=>d.id===activeDoctorId)?.name || 'doctor'}...`}
                     className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <button onClick={sendChat} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+                  <button onClick={sendChat} disabled={!chatInput.trim()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
                     <Send className="w-4 h-4" /> Send
                   </button>
                 </div>
@@ -344,9 +373,33 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            <button onClick={() => window.open('/profile.html', '_blank')} className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors" aria-label="Profile">
-              <User className="w-5 h-5" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileMenu((v) => !v)}
+                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
+                aria-haspopup="menu"
+                aria-expanded={showProfileMenu}
+                aria-label="Profile"
+              >
+                <User className="w-5 h-5" />
+              </button>
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <button
+                    onClick={() => { setShowProfileMenu(false); window.location.href = '/profile.html'; }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 first:rounded-t-lg"
+                  >
+                    View Profile
+                  </button>
+                  <button
+                    onClick={() => { setShowProfileMenu(false); logout(); }}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 last:rounded-b-lg"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
