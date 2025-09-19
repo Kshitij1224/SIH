@@ -1,9 +1,7 @@
-import React, { useState, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import './i18n';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './components/contexts/AuthContext';
-import { SettingsProvider } from './contexts/SettingsContext';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import HeartAnimation from './components/HeartAnimation';
 import Navigation from './components/Navigation';
 import BlurText from './components/BlurText';
@@ -22,7 +20,6 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 const AppContent = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const { isAuthenticated } = useAuth();
 
   const handleLandingComplete = () => {
     // Add a small delay to ensure the loading animation completes
@@ -156,45 +153,39 @@ const AppContent = () => {
 function App() {
   return (
     <Suspense fallback="Loading...">
-      <Router>
-        <AuthProvider>
-          <SettingsProvider>
-            <Routes>
-          <Route path="/" element={<AppContent />} />
-          <Route path="/login" element={<Navigate to="/" />} />
-          
-          {/* Protected Routes */}
-          <Route 
-            path="/patient/dashboard" 
-            element={
-              <ProtectedRoute requiredUserType="patient">
-                <PatientDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/doctor/dashboard" 
-            element={
-              <ProtectedRoute requiredUserType="doctor">
-                <DoctorDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/hospital/dashboard" 
-            element={
-              <ProtectedRoute requiredUserType="hospital">
-                <HospitalDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* Fallback route */}
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </SettingsProvider>
-        </AuthProvider>
-      </Router>
+      <Routes>
+        <Route path="/" element={<AppContent />} />
+        <Route path="/login" element={<Navigate to="/" />} />
+        
+        {/* Protected Routes */}
+        <Route 
+          path="/patient/dashboard" 
+          element={
+            <ProtectedRoute requiredUserType="patient">
+              <PatientDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/doctor/dashboard" 
+          element={
+            <ProtectedRoute requiredUserType="doctor">
+              <DoctorDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/hospital/dashboard" 
+          element={
+            <ProtectedRoute requiredUserType="hospital">
+              <HospitalDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </Suspense>
   );
 }

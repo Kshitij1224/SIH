@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 import { Calendar, Clock, Users, AlertCircle, TrendingUp, MessageSquare, X, Mail, Phone, MapPin, Stethoscope, CheckCircle } from 'lucide-react';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Doctor } from '../../../types/auth';
 
 // Define types

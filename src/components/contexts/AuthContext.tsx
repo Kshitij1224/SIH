@@ -86,7 +86,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(fullUser));
 
-        navigate(`/${type}/dashboard`);
+        navigate(`/${type}/dashboard`, {
+          replace: true,
+          state: { from: window.location.pathname }
+        });
+        
+        // Scroll to top after navigation
+        window.scrollTo(0, 0);
       } catch (err) {
         console.error('Login error:', err);
         alert('Login failed. Please try again.');

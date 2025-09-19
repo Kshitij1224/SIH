@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ const Navbar = () => {
   // Update active link when hash changes
   useEffect(() => {
     const updateActiveLink = () => {
-      const hash = window.location.hash || '#/';
+      const hash = window.location.hash || '/';
       setActiveLink(hash);
     };
     
@@ -25,22 +25,6 @@ const Navbar = () => {
     };
   }, []);
 
-  // Function to handle navigation and scroll to top
-  const handleNavigation = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const target = e.currentTarget.getAttribute('href');
-    if (target) {
-      // Close profile dropdown if open
-      setShowProfileDropdown(false);
-      // Update the URL
-      window.location.hash = target;
-      // Update active link
-      setActiveLink(target);
-      // Scroll to top of the page
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, []);
-  
   // Helper function to determine if a link is active
   const isActive = (path: string) => {
     if (path === '#/') {
@@ -73,9 +57,8 @@ const Navbar = () => {
           {/* Center Navigation (absolute centered) */}
           <div className="absolute inset-x-0 hidden md:flex justify-center">
             <div className="flex items-baseline space-x-4">
-              <a 
-                href="#/" 
-                onClick={handleNavigation}
+              <Link 
+                to="/" 
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -83,10 +66,9 @@ const Navbar = () => {
                 }`}
               >
                 Home
-              </a>
-              <a 
-                href="#/departments" 
-                onClick={handleNavigation}
+              </Link>
+              <Link 
+                to="/departments"
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/departments') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -94,10 +76,9 @@ const Navbar = () => {
                 }`}
               >
                 Departments
-              </a>
-              <a 
-                href="#/doctors" 
-                onClick={handleNavigation}
+              </Link>
+              <Link 
+                to="/doctors"
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/doctors') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -105,10 +86,9 @@ const Navbar = () => {
                 }`}
               >
                 Doctors
-              </a>
-              <a 
-                href="#/patients" 
-                onClick={handleNavigation}
+              </Link>
+              <Link 
+                to="/patients"
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/patients') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -116,10 +96,9 @@ const Navbar = () => {
                 }`}
               >
                 Patients
-              </a>
-              <a 
-                href="#/staff" 
-                onClick={handleNavigation}
+              </Link>
+              <Link 
+                to="/staff"
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/staff') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -127,7 +106,7 @@ const Navbar = () => {
                 }`}
               >
                 Staff
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -156,9 +135,8 @@ const Navbar = () => {
                     <p className="text-sm font-semibold text-gray-900">Dr. Admin</p>
                     <p className="text-xs text-gray-500">admin@medxhospital.in</p>
                   </div>
-                  <a
-                    href="#/settings"
-                    onClick={handleNavigation}
+                  <Link
+                    to="/settings"
                     className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm ${
                       isActive('#/settings') 
                         ? 'text-blue-700 bg-blue-50' 
@@ -166,14 +144,14 @@ const Navbar = () => {
                     }`}
                   >
                     <span>View Profile</span>
-                  </a>
+                  </Link>
                   <button
                     className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     onClick={() => {
                       // Clear any user data from localStorage
                       localStorage.removeItem('user');
-                      // Redirect to the main loading page
-                      window.location.href = '/';
+                      // Use navigate to redirect to app.tsx
+                      navigate('/app');
                     }}
                   >
                     <span>Sign out</span>
