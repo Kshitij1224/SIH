@@ -12,6 +12,12 @@ const Services = () => {
   const [units, setUnits] = useState<number>(1);
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
   const [bloodSearch, setBloodSearch] = useState<string>('');
+  // Payment state for Labs booking
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [bankType, setBankType] = useState<'UPI' | 'NetBanking' | 'Card'>('UPI');
+  const [pin, setPin] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   type BloodBank = {
     name: string;
@@ -39,6 +45,44 @@ const Services = () => {
       stock: { 'A+': 10, 'A-': 3, 'B+': 11, 'B-': 1, 'O+': 13, 'O-': 2, 'AB+': 5, 'AB-': 1 },
     },
   ];
+
+  // Reports: selected report details
+  const [selectedReport, setSelectedReport] = useState<HistoryItem | null>(null);
+
+  const getReportDetails = (h: HistoryItem) => {
+    // Derive simple mock details based on reason keyword
+    const reason = h.reason.toLowerCase();
+    if (reason.includes('fever')) {
+      return {
+        diagnosis: 'Viral Fever (suspected)',
+        treatment: 'Hydration, rest, and antipyretics as needed.',
+        medications: ['Paracetamol 500mg – twice daily for 3 days', 'ORS solution – as required'],
+        notes: 'Monitor temperature every 6 hours. Return if symptoms persist beyond 72 hours.'
+      };
+    }
+    if (reason.includes('skin')) {
+      return {
+        diagnosis: 'Allergic Dermatitis',
+        treatment: 'Topical corticosteroid and oral antihistamine.',
+        medications: ['Cetirizine 10mg – once daily for 5 days', 'Hydrocortisone 1% cream – apply thin layer twice daily'],
+        notes: 'Avoid known irritants, use mild soap. Follow up if rash spreads.'
+      };
+    }
+    if (reason.includes('knee') || reason.includes('pain')) {
+      return {
+        diagnosis: 'Patellofemoral Pain Syndrome',
+        treatment: 'NSAIDs, RICE protocol, and physiotherapy exercises.',
+        medications: ['Ibuprofen 400mg – twice daily after meals for 5 days'],
+        notes: 'Avoid high-impact activity. Begin quad strengthening as advised.'
+      };
+    }
+    return {
+      diagnosis: 'General Consultation',
+      treatment: 'Lifestyle advice and symptomatic management.',
+      medications: ['Multivitamin – once daily for 15 days'],
+      notes: 'Maintain hydration and balanced diet.'
+    };
+  };
 
   const labTests = [
     {
@@ -450,7 +494,7 @@ const Services = () => {
 
       {/* Global Toast */}
       {toastVisible && (
-        <div className="fixed top-4 right-4 z-[60]">
+        <div className="fixed top-4 right-4 z-50">
           <div className="flex items-start gap-3 rounded-lg border border-green-200 bg-white shadow-lg p-4 min-w-[280px]">
             <div className="mt-0.5">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -470,12 +514,9 @@ const Services = () => {
         </div>
       )}
 
+      {/* Labs Modal */}
       {showLabsModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          aria-modal="true"
-          role="dialog"
-        >
+        <div className="fixed inset-0 z-[60] flex items-center justify-center" aria-modal="true" role="dialog">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50"
@@ -610,10 +651,8 @@ const Services = () => {
                   <button
                     disabled={selectedTests.length === 0}
                     onClick={() => {
-                      alert(`Booked ${selectedTests.length} test(s):\n- ${selectedTests.join('\n- ')}\nTotal: ₹ ${totalPrice}`);
                       setShowLabsModal(false);
-                      setLabsStep('home');
-                      setSelectedTests([]);
+                      setShowPaymentModal(true);
                     }}
                     className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium ${selectedTests.length === 0 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                   >
@@ -751,6 +790,117 @@ const Services = () => {
         </div>
       )}
 
+      {/* Payment Modal for Labs */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => !isProcessing && setShowPaymentModal(false)}
+          />
+
+          {/* Modal card */}
+          <div className="relative z-10 w-full max-w-md mx-4 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-4 bg-blue-600 text-white flex items-center justify-between">
+              <div>
+                <div className="text-lg font-semibold">Confirm & Pay</div>
+                <div className="text-white/90 text-sm">Total: ₹ {totalPrice}</div>
+              </div>
+              <button
+                aria-label="Close"
+                onClick={() => !isProcessing && setShowPaymentModal(false)}
+                className="p-2 rounded-md hover:bg-white/10"
+                disabled={isProcessing}
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              {/* Summary */}
+              <div className="rounded-lg border border-gray-200 p-3 bg-gray-50 text-sm text-gray-700">
+                <div className="font-medium text-gray-900 mb-1">Selected Tests</div>
+                <ul className="list-disc list-inside space-y-0.5">
+                  {selectedTests.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Bank type selector */}
+              <div>
+                <div className="text-sm font-medium text-gray-800 mb-2">Payment Method</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['UPI','NetBanking','Card'] as const).map((bt) => (
+                    <button
+                      key={bt}
+                      onClick={() => setBankType(bt)}
+                      disabled={isProcessing}
+                      className={`px-3 py-2 rounded-lg border text-sm ${bankType===bt ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      {bt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* PIN input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Enter {bankType==='Card' ? 'Card PIN' : bankType==='UPI' ? 'UPI PIN' : 'Transaction PIN'}</label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="••••"
+                  disabled={isProcessing}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 tracking-widest"
+                />
+                <div className="mt-1 text-xs text-gray-500">PIN must be 4–6 digits</div>
+              </div>
+
+              {/* Pay button */}
+              <button
+                onClick={() => {
+                  if (pin.length < 4) return;
+                  setIsProcessing(true);
+                  setTimeout(() => {
+                    setPaymentSuccess(true);
+                    // finalize after short delay
+                    setTimeout(() => {
+                      setIsProcessing(false);
+                      setShowPaymentModal(false);
+                      setShowLabsModal(false);
+                      setLabsStep('home');
+                      setSelectedTests([]);
+                      setPin('');
+                      setBankType('UPI');
+                      showToast('Payment successful. Your lab booking is confirmed.');
+                      setPaymentSuccess(false);
+                    }, 900);
+                  }, 1200);
+                }}
+                disabled={isProcessing || pin.length < 4}
+                className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium ${pin.length < 4 || isProcessing ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+              >
+                {isProcessing ? 'Processing...' : `Pay ₹ ${totalPrice}`}
+              </button>
+
+              {/* Inline success message */}
+              {paymentSuccess && (
+                <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-md p-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4" /> Payment successful
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showReportsModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
@@ -780,23 +930,103 @@ const Services = () => {
 
             {/* Body */}
             <div className="p-6 max-h-[75vh] overflow-y-auto">
-              {history.length === 0 ? (
-                <div className="text-center text-gray-600">No appointments yet. Book one to see it here.</div>
+              {!selectedReport ? (
+                <>
+                  {history.length === 0 ? (
+                    <div className="text-center text-gray-600">No appointments yet. Book one to see it here.</div>
+                  ) : (
+                    <ul className="space-y-4">
+                      {history.map((h) => (
+                        <li
+                          key={h.id}
+                          className="p-4 rounded-lg border border-gray-200 hover:shadow-sm transition cursor-pointer"
+                          onClick={() => setSelectedReport(h)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') setSelectedReport(h);
+                          }}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div>
+                              <div className="font-semibold text-gray-900">{h.date} • {h.timeSlot}</div>
+                              <div className="text-sm text-gray-700">{h.doctor}</div>
+                              <div className="text-sm text-gray-600">{h.locationType}</div>
+                            </div>
+                            <div className="text-sm text-gray-700"><span className="font-medium">Reason:</span> {h.reason}</div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
               ) : (
-                <ul className="space-y-4">
-                  {history.map((h) => (
-                    <li key={h.id} className="p-4 rounded-lg border border-gray-200">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div>
-                          <div className="font-semibold text-gray-900">{h.date} • {h.timeSlot}</div>
-                          <div className="text-sm text-gray-700">{h.doctor}</div>
-                          <div className="text-sm text-gray-600">{h.locationType}</div>
+                <>
+                  {(() => {
+                    const h = selectedReport;
+                    const details = getReportDetails(h);
+                    return (
+                      <div className="space-y-5">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="text-lg font-semibold text-gray-900">Visit on {h.date} at {h.timeSlot}</div>
+                            <div className="text-sm text-gray-600">{h.locationType}</div>
+                          </div>
+                          <button
+                            className="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
+                            onClick={() => setSelectedReport(null)}
+                          >
+                            ← Back to Reports
+                          </button>
                         </div>
-                        <div className="text-sm text-gray-700"><span className="font-medium">Reason:</span> {h.reason}</div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 rounded-lg border border-gray-200">
+                            <div className="text-sm font-medium text-gray-700 mb-1">Doctor</div>
+                            <div className="text-gray-900">{h.doctor}</div>
+                          </div>
+                          <div className="p-4 rounded-lg border border-gray-200">
+                            <div className="text-sm font-medium text-gray-700 mb-1">Reason</div>
+                            <div className="text-gray-900">{h.reason}</div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-lg border border-gray-200">
+                          <div className="text-sm font-medium text-gray-700 mb-1">Diagnosis</div>
+                          <div className="text-gray-900">{details.diagnosis}</div>
+                        </div>
+
+                        <div className="p-4 rounded-lg border border-gray-200">
+                          <div className="text-sm font-medium text-gray-700 mb-2">Treatment</div>
+                          <p className="text-gray-900 text-sm">{details.treatment}</p>
+                        </div>
+
+                        <div className="p-4 rounded-lg border border-gray-200">
+                          <div className="text-sm font-medium text-gray-700 mb-2">Medications</div>
+                          <ul className="list-disc list-inside text-sm text-gray-900 space-y-1">
+                            {details.medications.map((m: string, idx: number) => (
+                              <li key={idx}>{m}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="p-4 rounded-lg border border-gray-200">
+                          <div className="text-sm font-medium text-gray-700 mb-1">Notes</div>
+                          <div className="text-gray-900 text-sm">{details.notes}</div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setSelectedReport(null)}
+                            className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          >
+                            Close
+                          </button>
+                        </div>
                       </div>
-                    </li>
-                  ))}
-                </ul>
+                    );
+                  })()}
+                </>
               )}
             </div>
           </div>
@@ -872,15 +1102,6 @@ const Services = () => {
                   </li>
                 ))}
               </ul>
-
-              <div className="mt-5">
-                <button
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  onClick={() => setShowEmergencyModal(false)}
-                >
-                  Close
-                </button>
-              </div>
             </div>
           </div>
         </div>
