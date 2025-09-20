@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Calendar, Clock, Search, Filter, Plus, ChevronLeft, ChevronRight, User, X } from 'lucide-react';
+import { Calendar, Clock, Search, Filter, Plus, ChevronLeft, ChevronRight, User, X, CheckCircle } from 'lucide-react';
 
 // Utility functions for generating random data
 const firstNames = ['John', 'Emily', 'Michael', 'Sarah', 'David', 'Jennifer', 'Robert', 'Lisa', 'James', 'Maria', 'William', 'Emma', 'Daniel', 'Olivia', 'Matthew'];
@@ -94,7 +94,45 @@ export function Appointments() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isProcessing, setIsProcessing] = useState<number | null>(null);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
-  
+  // Toast notification state
+  const [toast, setToast] = useState<{ visible: boolean; message: string }>(
+    { visible: false, message: '' }
+  );
+  const triggerToast = useCallback((message: string) => {
+    setToast({ visible: true, message });
+    window.setTimeout(() => setToast({ visible: false, message: '' }), 3000);
+  }, []);
+
+  // Helpers for date filtering
+  const toStartOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const isSameDay = (a: Date, b: Date) => toStartOfDay(a).getTime() === toStartOfDay(b).getTime();
+  const isSameMonth = (a: Date, b: Date) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+  const isInSameWeek = (date: Date, ref: Date) => {
+    const start = new Date(ref);
+    // Week starts on Sunday
+    start.setDate(ref.getDate() - ref.getDay());
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    const d = toStartOfDay(date).getTime();
+    return d >= toStartOfDay(start).getTime() && d <= toStartOfDay(end).getTime();
+  };
+
+  // Formatters for date inputs
+  const selectedDateISO = selectedDate.toISOString().split('T')[0];
+  const selectedMonthISO = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}`;
+
+  // Handle date/month input change
+  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, type } = e.target as HTMLInputElement;
+    if (!value) return;
+    if (type === 'month') {
+      const [y, m] = value.split('-').map(Number);
+      if (!isNaN(y) && !isNaN(m)) setSelectedDate(new Date(y, m - 1, 1));
+    } else {
+      setSelectedDate(new Date(value));
+    }
+  };
+
   // New appointment form state
   const [newAppointment, setNewAppointment] = useState({
     patient: '',
@@ -108,6 +146,15 @@ export function Appointments() {
   // Sort and filter appointments
   const sortAndFilterAppointments = useCallback(() => {
     let result = [...appointments];
+
+    // Filter by selected date and current view
+    result = result.filter(appt => {
+      const apptDate = new Date(appt.date);
+      if (currentView === 'day') return isSameDay(apptDate, selectedDate);
+      if (currentView === 'week') return isInSameWeek(apptDate, selectedDate);
+      // month view
+      return isSameMonth(apptDate, selectedDate);
+    });
     
     // Apply search filter
     if (searchQuery.trim() !== '') {
@@ -137,7 +184,7 @@ export function Appointments() {
     });
     
     setFilteredAppointments(result);
-  }, [appointments, searchQuery, sortBy, sortOrder]);
+  }, [appointments, searchQuery, sortBy, sortOrder, currentView, selectedDate]);
   
   useEffect(() => {
     sortAndFilterAppointments();
@@ -195,6 +242,8 @@ export function Appointments() {
       status: 'pending'
     });
     setShowNewAppointment(false);
+    // Show success toast
+    triggerToast('Appointment created successfully');
   };
 
   const handleAppointmentAction = async (requestId: number, action: 'accept' | 'decline') => {
@@ -343,7 +392,7 @@ export function Appointments() {
               </button>
               
               {showFilter && (
-                <div className="absolute z-10 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                <div className="absolute z-10 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 filter-container">
                   <div className="px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-100">
                     Sort by
                   </div>
@@ -379,7 +428,7 @@ export function Appointments() {
               )}
             </div>
           </div>
-
+          
           {/* View Controls */}
           <div className="flex items-center space-x-4">
             <div className="flex bg-gray-100 rounded-lg p-1">
@@ -407,7 +456,7 @@ export function Appointments() {
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-sm font-medium text-gray-900 min-w-[100px] text-center">
+              <span className="text-sm font-medium text-gray-900 min-w-[140px] text-center">
                 {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               <button 
@@ -418,6 +467,26 @@ export function Appointments() {
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
+              {/* Direct date/month picker */}
+              {currentView === 'month' ? (
+                <input
+                  type="month"
+                  value={selectedMonthISO}
+                  onChange={handleDateInputChange}
+                  className="ml-2 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Select month"
+                  title="Select month"
+                />
+              ) : (
+                <input
+                  type="date"
+                  value={selectedDateISO}
+                  onChange={handleDateInputChange}
+                  className="ml-2 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Select date"
+                  title="Select date"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -463,14 +532,12 @@ export function Appointments() {
                           </div>
                           <button 
                             onClick={() => {
-                              // Find the patient in patientDetails by name
                               const patientKey = Object.keys(patientDetails).find(key => 
                                 key.toLowerCase() === appointment.patient.toLowerCase()
                               );
                               if (patientKey) {
                                 setSelectedPatient(patientDetails[patientKey as keyof typeof patientDetails]);
                               } else {
-                                // Create a fallback patient if not found
                                 setSelectedPatient({
                                   id: appointment.id,
                                   age: 0,
@@ -853,6 +920,20 @@ export function Appointments() {
               >
                 View Full Record
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Toast Notification */}
+      {toast.visible && (
+        <div className="fixed top-6 right-6 z-50" role="status" aria-live="polite">
+          <div className="flex items-start space-x-3 bg-white border border-green-200 shadow-lg rounded-lg px-4 py-3">
+            <div className="mt-0.5 text-green-600">
+              <CheckCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">{toast.message}</p>
+              <p className="text-xs text-gray-500 mt-0.5">You can view it in your schedule.</p>
             </div>
           </div>
         </div>

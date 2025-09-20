@@ -8,43 +8,54 @@ export function Profile() {
   const { user } = useAuth();
   const doctor = user && user.role === 'doctor' ? (user as Doctor) : null;
   const [profile, setProfile] = useState({
-    name: doctor?.name || '',
-    specialty: doctor?.specialization || '',
-    email: doctor?.email || '',
-    phone: doctor?.phone || '',
-    address: doctor?.address || '',
-    hospital: doctor?.hospital || '',
-    experience: doctor?.experience ? `${doctor.experience} years` : '',
-    qualifications: doctor?.qualifications?.join(', ') || '',
-    consultationFee: doctor?.consultationFee ? `₹${doctor.consultationFee}` : '',
-    availableHours: doctor?.availableHours ? `${doctor.availableHours.days.join(', ')}: ${doctor.availableHours.startTime} - ${doctor.availableHours.endTime}` : '',
+    name: 'Dr. Sarah Johnson',
+    specialty: 'Cardiologist',
+    email: 'sarah.johnson@example.com',
+    phone: '+1 (555) 123-4567',
+    address: '123 Medical Drive, Suite 100, New York, NY 10001',
+    hospital: 'City General Hospital',
+    experience: '12 years',
+    qualifications: 'MBBS, MD (Medicine), DM (Cardiology)',
+    consultationFee: '$200',
+    availableHours: 'Mon - Fri: 09:00 - 16:00',
   });
 
   const certifications = [
     {
-      name: 'Board Certification - Cardiology',
-      issuer: 'American Board of Cardiology',
+      name: 'DM (Cardiology)',
+      issuer: 'All India Institute of Medical Sciences (AIIMS)',
       date: '2015',
       status: 'Valid'
     },
     {
       name: 'Advanced Cardiac Life Support (ACLS)',
-      issuer: 'American Heart Association',
+      issuer: 'Indian Resuscitation Council',
       date: '2023',
       status: 'Valid'
     },
     {
-      name: 'Interventional Cardiology Certificate',
-      issuer: 'American College of Cardiology',
+      name: 'Fellowship in Interventional Cardiology',
+      issuer: 'Cardiological Society of India (CSI)',
       date: '2018',
       status: 'Valid'
     },
   ];
 
+  // Derive initials for avatar
+  const initials = profile.name
+    ? profile.name
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(s => s[0]?.toUpperCase())
+        .join('')
+    : 'DR';
+
   const handleSave = () => {
     // Save logic here
     setIsEditing(false);
   };
+
 
   return (
     <div className="space-y-6">
@@ -54,7 +65,7 @@ export function Profile() {
           <h1 className="text-2xl font-bold text-gray-900">Doctor Profile</h1>
           <p className="text-gray-600 mt-1">Manage your professional information and credentials</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-wrap gap-3">
           {isEditing ? (
             <>
               <button
@@ -88,7 +99,7 @@ export function Profile() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="text-center">
             <div className="w-24 h-24 bg-blue-100 rounded-full mx-auto flex items-center justify-center mb-4">
-              <span className="text-blue-600 font-bold text-2xl">SJ</span>
+              <span className="text-blue-600 font-bold text-2xl">{initials}</span>
             </div>
             {isEditing && (
               <button className="mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1 mx-auto">

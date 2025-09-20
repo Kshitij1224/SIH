@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Search, Send, Paperclip, Phone, Video, MoreVertical, MessageSquare, ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Send, Paperclip, Phone, Video, MoreVertical, MessageSquare, ArrowLeft, PhoneCall, PhoneOff, Mic, MicOff, Volume2, VolumeX, CameraOff } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -83,6 +83,28 @@ export function Messages() {
   const [messageInput, setMessageInput] = useState('');
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [searchQuery, setSearchQuery] = useState('');
+  // Call state
+  const [showCall, setShowCall] = useState(false);
+  const [callSeconds, setCallSeconds] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
+  // Video call state
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoSeconds, setVideoSeconds] = useState(0);
+  const [videoMuted, setVideoMuted] = useState(false);
+  const [cameraOn, setCameraOn] = useState(true);
+
+  useEffect(() => {
+    if (!showCall) return;
+    const id = setInterval(() => setCallSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [showCall]);
+
+  useEffect(() => {
+    if (!showVideo) return;
+    const id = setInterval(() => setVideoSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [showVideo]);
 
   const filteredConversations = conversations.filter(conv =>
     conv.patient.toLowerCase().includes(searchQuery.toLowerCase())
@@ -218,6 +240,7 @@ export function Messages() {
                   className="p-2 rounded-full hover:bg-gray-100"
                   aria-label="Audio call"
                   title="Audio call"
+                  onClick={() => { setShowCall(true); setCallSeconds(0); setIsMuted(false); setIsSpeakerOn(false); }}
                 >
                   <Phone className="h-5 w-5 text-gray-600" />
                 </button>
@@ -225,6 +248,7 @@ export function Messages() {
                   className="p-2 rounded-full hover:bg-gray-100"
                   aria-label="Video call"
                   title="Video call"
+                  onClick={() => { setShowVideo(true); setVideoSeconds(0); setVideoMuted(false); setCameraOn(true); }}
                 >
                   <Video className="h-5 w-5 text-gray-600" />
                 </button>
@@ -308,6 +332,126 @@ export function Messages() {
           </div>
         )}
       </div>
+      {/* Call Popup */}
+      {showCall && selectedChat && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-green-700">
+                <PhoneCall className="w-5 h-5" />
+                <span className="text-sm font-medium">Calling {selectedChat.patient}</span>
+              </div>
+              <span className="text-xs text-gray-700">
+                {`${String(Math.floor(callSeconds/60)).padStart(2,'0')}:${String(callSeconds%60).padStart(2,'0')}`}
+              </span>
+            </div>
+            <div className="p-6 flex items-center space-x-4">
+              <img src={selectedChat.avatar} alt={selectedChat.patient} className="w-16 h-16 rounded-full object-cover" />
+              <div className="flex-1 min-w-0">
+                <div className="text-lg font-semibold text-gray-900 truncate">{selectedChat.patient}</div>
+                <div className="text-sm text-gray-600 truncate">{selectedChat.online ? 'Online' : 'Offline'}</div>
+              </div>
+            </div>
+            <div className="px-6 pb-6 pt-2 flex items-center justify-between">
+              <button
+                onClick={() => setIsMuted(m => !m)}
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm border ${isMuted ? 'bg-red-50 text-red-700 border-red-300' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}`}
+                aria-pressed={isMuted}
+                aria-label="Toggle mute"
+              >
+                {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                <span>{isMuted ? 'Muted' : 'Mute'}</span>
+              </button>
+              <button
+                onClick={() => setIsSpeakerOn(s => !s)}
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm border ${isSpeakerOn ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}`}
+                aria-pressed={isSpeakerOn}
+                aria-label="Speaker"
+              >
+                {isSpeakerOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                <span>{isSpeakerOn ? 'Speaker On' : 'Speaker Off'}</span>
+              </button>
+              <button
+                onClick={() => { setShowCall(false); setCallSeconds(0); setIsMuted(false); setIsSpeakerOn(false); }}
+                className="flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm bg-red-600 text-white hover:bg-red-700"
+                aria-label="End call"
+              >
+                <PhoneOff className="w-5 h-5" />
+                <span>End</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Video Call Popup */}
+      {showVideo && selectedChat && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
+            <div className="px-6 py-4 border-b flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-blue-700">
+                <Video className="w-5 h-5" />
+                <span className="text-sm font-medium">Video call with {selectedChat.patient}</span>
+              </div>
+              <span className="text-xs text-gray-700">
+                {`${String(Math.floor(videoSeconds/60)).padStart(2,'0')}:${String(videoSeconds%60).padStart(2,'0')}`}
+              </span>
+            </div>
+            <div className="p-4 grid grid-cols-1 md:grid-cols-12 gap-4 bg-gray-900">
+              {/* Remote video placeholder */}
+              <div className="md:col-span-9 h-64 md:h-96 bg-black rounded-lg flex items-center justify-center">
+                {cameraOn ? (
+                  <img src={selectedChat.avatar} alt={selectedChat.patient} className="w-40 h-40 rounded-full object-cover opacity-80" />
+                ) : (
+                  <div className="text-gray-400 flex flex-col items-center">
+                    <CameraOff className="w-10 h-10 mb-2" />
+                    <span>Camera is off</span>
+                  </div>
+                )}
+              </div>
+              {/* Local video thumbnail */}
+              <div className="md:col-span-3 space-y-4">
+                <div className="h-32 bg-black rounded-lg flex items-center justify-center">
+                  <div className="text-gray-400 text-xs">You</div>
+                </div>
+                <div className="bg-white rounded-lg p-3 text-sm">
+                  <div className="font-medium text-gray-900 truncate">{selectedChat.patient}</div>
+                  <div className="text-gray-500">{selectedChat.online ? 'Online' : 'Offline'}</div>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 bg-white flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setVideoMuted(m => !m)}
+                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm border ${videoMuted ? 'bg-red-50 text-red-700 border-red-300' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}`}
+                  aria-pressed={videoMuted}
+                  aria-label="Toggle mute"
+                >
+                  {videoMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  <span>{videoMuted ? 'Muted' : 'Mute'}</span>
+                </button>
+                <button
+                  onClick={() => setCameraOn(c => !c)}
+                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm border ${!cameraOn ? 'bg-yellow-50 text-yellow-700 border-yellow-300' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}`}
+                  aria-pressed={!cameraOn}
+                  aria-label="Toggle camera"
+                >
+                  <CameraOff className="w-5 h-5" />
+                  <span>{cameraOn ? 'Camera On' : 'Camera Off'}</span>
+                </button>
+              </div>
+              <button
+                onClick={() => { setShowVideo(false); setVideoSeconds(0); setVideoMuted(false); setCameraOn(true); }}
+                className="flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm bg-red-600 text-white hover:bg-red-700"
+                aria-label="End video call"
+              >
+                <PhoneOff className="w-5 h-5" />
+                <span>End</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
