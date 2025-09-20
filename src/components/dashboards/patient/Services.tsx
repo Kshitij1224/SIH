@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TestTube, Calendar, AlertTriangle, FileText, PhoneCall, MapPin, X, Clock, User, ChevronRight, Droplet, Microscope, ClipboardList, Truck, ShoppingBag, Building, Search, CheckCircle2 } from 'lucide-react';
+import { TestTube, Calendar, AlertTriangle, FileText, PhoneCall, MapPin, X, Clock, User, ChevronRight, Droplet, Microscope, ClipboardList, Truck, ShoppingBag, Building, Search, CheckCircle2, ArrowLeft } from 'lucide-react';
 
 const Services = () => {
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
@@ -29,19 +29,19 @@ const Services = () => {
     {
       name: 'KIMS Blood Bank (KIIT Campus)',
       address: 'KIIT University, Patia, Bhubaneswar 751024',
-      phone: '+916742725555',
+      phone: 'Ph No. +916742725555',
       stock: { 'A+': 12, 'A-': 4, 'B+': 9, 'B-': 2, 'O+': 15, 'O-': 3, 'AB+': 6, 'AB-': 1 },
     },
     {
       name: 'Capital Hospital Blood Bank',
       address: 'Unit 6, Near AG Square, Bhubaneswar 751001',
-      phone: '+916742395638',
+      phone: 'Ph No. +916742395638',
       stock: { 'A+': 8, 'A-': 2, 'B+': 7, 'B-': 2, 'O+': 10, 'O-': 2, 'AB+': 3, 'AB-': 0 },
     },
     {
       name: 'SUM Hospital Blood Bank',
       address: 'K8, Kalinga Nagar, Bhubaneswar 751003',
-      phone: '+916742384800',
+      phone: 'Ph No. +916742384800',
       stock: { 'A+': 10, 'A-': 3, 'B+': 11, 'B-': 1, 'O+': 13, 'O-': 2, 'AB+': 5, 'AB-': 1 },
     },
   ];
@@ -227,31 +227,31 @@ const Services = () => {
     {
       name: 'KIMS Hospital (KIIT Campus)',
       address: 'KIIT University, Patia, Bhubaneswar, Odisha 751024',
-      phone: '+916742725555',
+      phone: 'Ph No. +916742725555',
       mapsQuery: 'KIMS Hospital KIIT Bhubaneswar',
     },
     {
       name: 'Apollo Hospitals Bhubaneswar',
       address: 'Old Sainik School Rd, Unit 15, Bhubaneswar, Odisha 751005',
-      phone: '+916742540200',
+      phone: 'Ph No. +916742540200',
       mapsQuery: 'Apollo Hospitals Bhubaneswar',
     },
     {
       name: 'AMRI Hospitals Bhubaneswar',
       address: 'Plot No. 1, Near Satyasai Enclave, Khandagiri, Bhubaneswar, Odisha 751030',
-      phone: '+916746666600',
+      phone: 'Ph No. +916746666600',
       mapsQuery: 'AMRI Hospitals Bhubaneswar',
     },
     {
       name: 'SUM Ultimate Medicare',
       address: 'K8, Kalinga Nagar, Bhubaneswar, Odisha 751003',
-      phone: '+9118003132424',
+      phone: 'Ph No. +9118003132424',
       mapsQuery: 'SUM Ultimate Medicare Bhubaneswar',
     },
     {
       name: 'Hi-Tech Medical College & Hospital',
       address: 'Pandra, Rasulgarh, Bhubaneswar, Odisha 751025',
-      phone: '+916742371700',
+      phone: 'Ph No. +916742371700',
       mapsQuery: 'Hi-Tech Medical College and Hospital Bhubaneswar',
     },
   ];
@@ -263,7 +263,8 @@ const Services = () => {
       icon: TestTube,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
-      hoverColor: 'hover:bg-blue-600',
+      hoverColor: 'hover:bg-blue-600 hover:shadow-lg hover:-translate-y-1',
+      iconHover: 'group-hover:scale-110 group-hover:rotate-6',
     },
     {
       title: 'Book Appointment',
@@ -271,7 +272,8 @@ const Services = () => {
       icon: Calendar,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
-      hoverColor: 'hover:bg-green-600',
+      hoverColor: 'hover:bg-green-600 hover:shadow-lg hover:-translate-y-1',
+      iconHover: 'group-hover:scale-110 group-hover:rotate-6',
     },
     {
       title: 'Emergency',
@@ -279,7 +281,8 @@ const Services = () => {
       icon: AlertTriangle,
       color: 'text-red-600',
       bgColor: 'bg-red-50',
-      hoverColor: 'hover:bg-red-600',
+      hoverColor: 'hover:bg-red-600 hover:shadow-lg hover:-translate-y-1',
+      iconHover: 'group-hover:scale-110 group-hover:rotate-6',
     },
     {
       title: 'Your Reports',
@@ -287,7 +290,8 @@ const Services = () => {
       icon: FileText,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
-      hoverColor: 'hover:bg-purple-600',
+      hoverColor: 'hover:bg-purple-600 hover:shadow-lg hover:-translate-y-1',
+      iconHover: 'group-hover:scale-110 group-hover:rotate-6',
     },
   ];
 
@@ -300,7 +304,7 @@ const Services = () => {
           return (
             <div
               key={index}
-              className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group ${service.hoverColor} hover:text-white`}
+              className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 transition-all duration-300 cursor-pointer group ${service.hoverColor} hover:text-white relative overflow-hidden`}
               onClick={() => {
                 if (service.title === 'Emergency') {
                   setShowEmergencyModal(true);
@@ -318,18 +322,23 @@ const Services = () => {
                 }
               }}
             >
-              <div className="flex items-center space-x-4">
-                <div className={`p-4 rounded-lg ${service.bgColor} group-hover:bg-white/20 transition-colors`}>
-                  <Icon className={`w-8 h-8 ${service.color} group-hover:text-white transition-colors`} />
+              {/* Animated background on hover */}
+              <div className={`absolute inset-0 ${service.bgColor.replace('bg-', 'from-')} bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10`}></div>
+              
+              <div className="flex items-center space-x-4 relative">
+                <div className={`p-4 rounded-xl ${service.bgColor} group-hover:bg-opacity-0 transition-all duration-300 shadow-sm ${service.iconHover}`}>
+                  <Icon className={`w-8 h-8 ${service.color} group-hover:text-white transition-colors duration-300`} />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-white transition-colors">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-white transition-colors duration-300">
                     {service.title}
+                    <span className="absolute inset-0"></span>
                   </h3>
-                  <p className="text-gray-600 group-hover:text-white/80 transition-colors">
+                  <p className="text-gray-600 group-hover:text-white/90 transition-colors duration-300">
                     {service.description}
                   </p>
                 </div>
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-white/80 transition-transform duration-300 group-hover:translate-x-1" />
               </div>
             </div>
           );
@@ -553,32 +562,34 @@ const Services = () => {
                   {/* Labs Option */}
                   <button
                     onClick={() => setLabsStep('labs')}
-                    className="group w-full text-left p-5 border border-gray-200 rounded-lg hover:shadow-md transition-all hover:-translate-y-0.5"
+                    className="group w-full text-left p-6 border-2 border-blue-100 rounded-xl hover:shadow-lg transition-all hover:-translate-y-1 bg-gradient-to-br from-blue-50 to-white hover:from-blue-100"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-lg bg-blue-50">
-                        <Microscope className="w-6 h-6 text-blue-600" />
+                    <div className="flex items-center gap-4">
+                      <div className="p-3.5 rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                        <Microscope className="w-7 h-7 text-blue-700" />
                       </div>
                       <div>
-                        <div className="text-base font-semibold text-gray-900">Labs</div>
-                        <div className="text-sm text-gray-600">Book lab tests and diagnostics</div>
+                        <div className="text-lg font-bold text-blue-900">Labs</div>
+                        <div className="text-sm text-blue-700/90">Book lab tests and diagnostics</div>
                       </div>
+                      <ChevronRight className="ml-auto w-5 h-5 text-blue-400 group-hover:text-blue-600 transition-colors" />
                     </div>
                   </button>
 
                   {/* Blood Banks Option */}
                   <button
                     onClick={() => setLabsStep('blood')}
-                    className="group w-full text-left p-5 border border-gray-200 rounded-lg hover:shadow-md transition-all hover:-translate-y-0.5"
+                    className="group w-full text-left p-6 border-2 border-red-100 rounded-xl hover:shadow-lg transition-all hover:-translate-y-1 bg-gradient-to-br from-red-50 to-white hover:from-red-100"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-lg bg-red-50">
-                        <Droplet className="w-6 h-6 text-red-600" />
+                    <div className="flex items-center gap-4">
+                      <div className="p-3.5 rounded-xl bg-red-100 group-hover:bg-red-200 transition-colors">
+                        <Droplet className="w-7 h-7 text-red-700" />
                       </div>
                       <div>
-                        <div className="text-base font-semibold text-gray-900">Blood Banks</div>
-                        <div className="text-sm text-gray-600">Find nearby blood banks</div>
+                        <div className="text-lg font-bold text-red-900">Blood Banks</div>
+                        <div className="text-sm text-red-700/90">Find nearby blood banks</div>
                       </div>
+                      <ChevronRight className="ml-auto w-5 h-5 text-red-400 group-hover:text-red-600 transition-colors" />
                     </div>
                   </button>
                 </div>
@@ -595,9 +606,12 @@ const Services = () => {
                       setLabsStep('home');
                       setSelectedTests([]);
                     }}
-                    className="text-sm text-blue-600 hover:text-blue-700"
+                    className="text-sm"
                   >
-                    ← Back
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </div>
                   </button>
                 </div>
 
@@ -670,7 +684,15 @@ const Services = () => {
                     <Building className="w-4 h-4" />
                     <span>Blood Banks</span>
                   </div>
-                  <button onClick={() => setLabsStep('home')} className="text-sm text-blue-600 hover:text-blue-700">← Back</button>
+                  <button 
+                    onClick={() => setLabsStep('home')} 
+                    className="text-sm"
+                  >
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </div>
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
@@ -935,11 +957,11 @@ const Services = () => {
                   {history.length === 0 ? (
                     <div className="text-center text-gray-600">No appointments yet. Book one to see it here.</div>
                   ) : (
-                    <ul className="space-y-4">
+                    <ul className="space-y-3">
                       {history.map((h) => (
                         <li
                           key={h.id}
-                          className="p-4 rounded-lg border border-gray-200 hover:shadow-sm transition cursor-pointer"
+                          className="group relative p-0 rounded-xl overflow-hidden border-2 border-purple-50 hover:border-purple-100 bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
                           onClick={() => setSelectedReport(h)}
                           role="button"
                           tabIndex={0}
@@ -947,10 +969,26 @@ const Services = () => {
                             if (e.key === 'Enter' || e.key === ' ') setSelectedReport(h);
                           }}
                         >
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <div>
-                              <div className="font-semibold text-gray-900">{h.date} • {h.timeSlot}</div>
-                              <div className="text-sm text-gray-700">{h.doctor}</div>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          <div className="relative flex flex-col sm:flex-row sm:items-center gap-4 p-4">
+                            <div className="flex-shrink-0 p-2.5 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors duration-300">
+                              <FileText className="w-5 h-5 text-purple-700" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div>
+                                  <div className="font-bold text-gray-900 group-hover:text-purple-900 transition-colors duration-200">
+                                    {h.date} • {h.timeSlot}
+                                  </div>
+                                  <div className="text-sm text-gray-700 group-hover:text-purple-800/90 transition-colors duration-200">{h.doctor}</div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 group-hover:bg-purple-200 transition-colors duration-200">
+                                    {h.locationType}
+                                  </span>
+                                  <ChevronRight className="w-4 h-4 text-purple-400 group-hover:text-purple-600 transition-colors duration-200" />
+                                </div>
+                              </div>
                               <div className="text-sm text-gray-600">{h.locationType}</div>
                             </div>
                             <div className="text-sm text-gray-700"><span className="font-medium">Reason:</span> {h.reason}</div>
@@ -973,10 +1011,10 @@ const Services = () => {
                             <div className="text-sm text-gray-600">{h.locationType}</div>
                           </div>
                           <button
-                            className="px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
+                            className="px-3 py-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 text-sm transition-colors flex items-center gap-1"
                             onClick={() => setSelectedReport(null)}
                           >
-                            ← Back to Reports
+                            <ArrowLeft className="w-4 h-4" /> <span>Back to Reports</span>
                           </button>
                         </div>
 
@@ -1014,15 +1052,6 @@ const Services = () => {
                           <div className="text-sm font-medium text-gray-700 mb-1">Notes</div>
                           <div className="text-gray-900 text-sm">{details.notes}</div>
                         </div>
-
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setSelectedReport(null)}
-                            className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
-                          >
-                            Close
-                          </button>
-                        </div>
                       </div>
                     );
                   })()}
@@ -1046,11 +1075,11 @@ const Services = () => {
           />
 
           {/* Modal card */}
-          <div className="relative z-10 w-full max-w-xl mx-4 bg-white rounded-xl shadow-lg border border-gray-200">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+          <div className="relative z-10 w-full max-w-2xl mx-4 bg-white rounded-xl shadow-lg border border-gray-200">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-red-100 bg-red-50 rounded-t-xl">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Nearby Hospitals</h3>
+                <h3 className="text-lg font-semibold text-red-900">Nearby Hospitals</h3>
               </div>
               <button
                 aria-label="Close"
@@ -1068,34 +1097,49 @@ const Services = () => {
 
               <ul className="space-y-4">
                 {nearbyHospitals.map((h, idx) => (
-                  <li key={idx} className="p-4 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h4 className="text-base font-semibold text-gray-900">{h.name}</h4>
-                        <div className="mt-1 flex items-start gap-2 text-gray-600">
-                          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-500" />
+                  <li key={idx} className="group relative p-4 rounded-xl border-2 border-red-100 bg-gradient-to-br from-red-50 to-white hover:border-red-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-white opacity-0 group-hover:opacity-100 rounded-lg transition-opacity duration-300"></div>
+                    <div className="relative flex items-start justify-between gap-4">
+                      <div className="flex-shrink-0 p-2.5 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-300">
+                        <Building className="w-5 h-5 text-red-700" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-base font-bold text-gray-900 group-hover:text-red-900 transition-colors">{h.name}</h4>
+                        <div className="mt-1.5 flex items-start gap-2 text-gray-600 group-hover:text-red-700/90 transition-colors">
+                          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500" />
                           <span className="text-sm">{h.address}</span>
                         </div>
                         {h.phone && (
-                          <div className="mt-1 text-gray-700 text-sm">{h.phone}</div>
+                          <div className="mt-1.5 flex items-center gap-2 text-gray-700 group-hover:text-red-800 transition-colors">
+                            <PhoneCall className="w-4 h-4 text-red-500" />
+                            <span className="text-sm font-medium">{h.phone}</span>
+                          </div>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
                         {h.phone && (
                           <a
                             href={`tel:${h.phone.replace(/\s|\(|\)|-/g, '')}`}
-                            className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 text-sm"
+                            className="group/button relative inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-sm font-medium shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
                           >
-                            <PhoneCall className="w-4 h-4" /> Call
+                            <span className="relative z-10 flex items-center gap-2">
+                              <PhoneCall className="w-4 h-4" />
+                              <span>Call Now</span>
+                            </span>
+                            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></span>
                           </a>
                         )}
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.mapsQuery)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
+                          className="group/map relative inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-red-100 bg-white hover:bg-red-50 text-red-700 hover:text-red-800 text-sm font-medium shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
                         >
-                          <MapPin className="w-4 h-4" /> Maps
+                          <span className="relative z-10 flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            <span>View on Map</span>
+                          </span>
+                          <span className="absolute inset-0 bg-red-100/30 opacity-0 group-hover/map:opacity-100 transition-opacity duration-300"></span>
                         </a>
                       </div>
                     </div>

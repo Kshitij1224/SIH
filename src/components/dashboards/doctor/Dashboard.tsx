@@ -557,35 +557,112 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Today's Appointments */}
-        <div className="lg:col-span-2">
-          {/* Today's Appointments content */}
-        </div>
-        
-        {/* Right Column - Quick Actions */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-4">
-              <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <Calendar className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                <div className="text-sm font-medium text-gray-900">Schedule</div>
-              </button>
-              <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <Users className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <div className="text-sm font-medium text-gray-900">Add Patient</div>
-              </button>
-              <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <MessageSquare className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                <div className="text-sm font-medium text-gray-900">Messages</div>
-              </button>
-              <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <TrendingUp className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-                <div className="text-sm font-medium text-gray-900">Reports</div>
-              </button>
+      {/* Main Content Grid - 3 Column Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        {/* Column 1: Prescription Maker */}
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Prescription Maker</h2>
+          <div className="space-y-4">
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Stethoscope className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Create New Prescription</h3>
+                  <p className="text-sm text-gray-500">Generate prescriptions for patients</p>
+                </div>
+              </div>
             </div>
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-green-50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Recent Prescriptions</h3>
+                  <p className="text-sm text-gray-500">View and manage past prescriptions</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Calendar className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Prescription History</h3>
+                  <p className="text-sm text-gray-500">Track all prescribed medications</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Column 2: Report Analysis */}
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Report Analysis</h2>
+          <div className="space-y-4">
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Analyze Lab Results</h3>
+                  <p className="text-sm text-gray-500">Review and interpret patient lab reports</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-yellow-50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Generate Reports</h3>
+                  <p className="text-sm text-gray-500">Create detailed medical reports</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Patient Reports</h3>
+                  <p className="text-sm text-gray-500">Access all patient medical reports</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Column 3: Quick Actions */}
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
+              <Calendar className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Schedule</div>
+            </button>
+            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
+              <Users className="w-6 h-6 text-green-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Add Patient</div>
+            </button>
+            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
+              <MessageSquare className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Messages</div>
+            </button>
+            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-orange-50 transition-colors">
+              <TrendingUp className="w-6 h-6 text-orange-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Reports</div>
+            </button>
+            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-red-50 transition-colors col-span-2">
+              <Stethoscope className="w-6 h-6 text-red-600 mx-auto mb-2" />
+              <div className="text-sm font-medium text-gray-900">Start Video Consultation</div>
+            </button>
           </div>
         </div>
       </div>

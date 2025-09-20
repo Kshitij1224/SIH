@@ -1,7 +1,7 @@
 import { useState, Suspense } from 'react';
 import './i18n';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import HeartAnimation from './components/HeartAnimation';
 import Navigation from './components/Navigation';
 import BlurText from './components/BlurText';
@@ -15,11 +15,17 @@ import Footer from './components/Footer';
 import PatientDashboard from './components/dashboards/PatientDashboard';
 import DoctorDashboard from './components/dashboards/DoctorDashboard';
 import HospitalDashboard from './components/dashboards/HospitalDashboard';
+import AppointmentsPage from './components/dashboards/patient/AppointmentsPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import AIChatPage from './pages/AIChatPage';
 
 const AppContent = () => {
-  const [showLanding, setShowLanding] = useState(true);
+  const location = useLocation();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLanding, setShowLanding] = useState(() => {
+    // Skip loading if coming from sign out
+    return !location.state?.skipLoading;
+  });
 
   const handleLandingComplete = () => {
     // Add a small delay to ensure the loading animation completes
@@ -166,6 +172,15 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        <Route 
+          path="/patient/appointments" 
+          element={
+            <ProtectedRoute requiredUserType="patient">
+              <AppointmentsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="/chat" element={<AIChatPage />} />
         <Route 
           path="/doctor/dashboard" 
           element={

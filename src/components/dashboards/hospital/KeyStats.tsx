@@ -53,12 +53,14 @@ const KeyStats = () => {
     {
       title: 'Admissions',
       value: '124',
-      subtitle: 'New patients admitted today',
+      subtitle: 'New patients today',
       icon: UserPlus,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-100/80',
+      bgColor: 'bg-blue-50',
       trend: '+12%',
       trendColor: 'text-green-600',
+      chartData: [30, 45, 60, 55, 80, 95, 124], // Weekly trend data
+      avgDaily: 89, // Average daily admissions
     },
     {
       title: 'Discharges',
@@ -115,7 +117,7 @@ const KeyStats = () => {
   // Function to get gradient colors based on card type
   const getCardGradient = (title: string) => {
     switch(title) {
-      case 'Admissions': return 'from-blue-50 to-blue-100';
+      case 'Admissions': return 'from-blue-50 to-blue-50 bg-gradient-to-br hover:from-blue-50 hover:to-blue-100 transition-all duration-300';
       case 'Discharges': return 'from-green-50 to-green-100';
       case 'Bed Occupancy': return 'from-amber-50 to-amber-100';
       case 'ER Wait Time': return 'from-rose-50 to-rose-100';
@@ -196,12 +198,39 @@ const KeyStats = () => {
                   <h3 className="text-sm font-medium text-gray-700">
                     {stat.title}
                   </h3>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                  <div className="flex items-end justify-between w-full">
+                    <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                    {stat.chartData && (
+                      <div className="flex items-end h-10 -mb-1">
+                        {stat.chartData.map((value, i) => {
+                          const height = (value / Math.max(...stat.chartData)) * 20;
+                          return (
+                            <div 
+                              key={i}
+                              className="w-1.5 mx-0.5 bg-blue-300 rounded-t-sm"
+                              style={{ height: `${height}px` }}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-gray-900 mt-1">
                     {stat.value}
                   </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {stat.subtitle}
-                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-600">
+                      {stat.subtitle}
+                    </p>
+                    {stat.avgDaily !== undefined && (
+                      <div className="flex items-center text-xs text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        Avg. {stat.avgDaily}/day
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 {/* View details link */}

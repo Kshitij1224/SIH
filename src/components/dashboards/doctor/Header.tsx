@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react';
 import { TabType } from '../DoctorDashboard';
 import { Doctor } from '../../../types/auth';
+import { useNavigate } from 'react-router-dom';
 interface HeaderProps {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
@@ -9,6 +10,7 @@ interface HeaderProps {
 }
 
 export function Header({ activeTab, setActiveTab, doctor }: HeaderProps) {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
@@ -86,7 +88,15 @@ export function Header({ activeTab, setActiveTab, doctor }: HeaderProps) {
                   <User className="w-4 h-4 mr-3" />
                   View Profile
                 </button>
-                <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                <button 
+                  onClick={() => {
+                    // Clear user data from localStorage
+                    localStorage.removeItem('user');
+                    // Navigate to root with skipLoading state
+                    navigate('/', { state: { skipLoading: true } });
+                  }}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
                   <LogOut className="w-4 h-4 mr-3" />
                   Sign out
                 </button>

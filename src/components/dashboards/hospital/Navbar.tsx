@@ -27,10 +27,22 @@ const Navbar = () => {
 
   // Helper function to determine if a link is active
   const isActive = (path: string) => {
-    if (path === '#/') {
-      return activeLink === '#/' || activeLink === '';
+    // Get the current hash, default to '#/' if empty
+    const currentHash = window.location.hash || '#/';
+    
+    // Special case for home
+    if (path === '#/' && (currentHash === '' || currentHash === '#' || currentHash === '#/')) {
+      return true;
     }
-    return activeLink.startsWith(path);
+    
+    // Handle exact match for other paths
+    return currentHash === path;
+  };
+  
+  // Handle navigation to ensure proper hash routing
+  const handleNavigation = (path: string) => {
+    window.location.hash = path;
+    setActiveLink(path);
   };
 
   return (
@@ -58,7 +70,8 @@ const Navbar = () => {
           <div className="absolute inset-x-0 hidden md:flex justify-center">
             <div className="flex items-baseline space-x-4">
               <Link 
-                to="/" 
+                to="#/" 
+                onClick={() => handleNavigation('#/')}
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -68,7 +81,8 @@ const Navbar = () => {
                 Home
               </Link>
               <Link 
-                to="/departments"
+                to="#/departments"
+                onClick={() => handleNavigation('#/departments')}
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/departments') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -77,10 +91,11 @@ const Navbar = () => {
               >
                 Departments
               </Link>
-              <Link 
-                to="/doctors"
+              <Link
+                to="#/doctors"
+                onClick={() => handleNavigation('#/doctors')}
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
-                  isActive('#/doctors') 
+                  isActive('#/doctors')
                     ? 'text-blue-700 bg-blue-100' 
                     : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
                 }`}
@@ -88,7 +103,8 @@ const Navbar = () => {
                 Doctors
               </Link>
               <Link 
-                to="/patients"
+                to="#/patients"
+                onClick={() => handleNavigation('#/patients')}
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/patients') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -98,7 +114,8 @@ const Navbar = () => {
                 Patients
               </Link>
               <Link 
-                to="/staff"
+                to="#/staff"
+                onClick={() => handleNavigation('#/staff')}
                 className={`px-3 py-2 rounded-md font-medium transition-colors ${
                   isActive('#/staff') 
                     ? 'text-blue-700 bg-blue-100' 
@@ -133,10 +150,14 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-semibold text-gray-900">Dr. Admin</p>
-                    <p className="text-xs text-gray-500">admin@medxhospital.in</p>
+                   
                   </div>
                   <Link
-                    to="/settings"
+                    to="#/settings"
+                    onClick={() => {
+                      handleNavigation('#/settings');
+                      setShowProfileDropdown(false);
+                    }}
                     className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm ${
                       isActive('#/settings') 
                         ? 'text-blue-700 bg-blue-50' 
@@ -150,8 +171,8 @@ const Navbar = () => {
                     onClick={() => {
                       // Clear any user data from localStorage
                       localStorage.removeItem('user');
-                      // Use navigate to redirect to app.tsx
-                      navigate('/app');
+                      // Navigate to root with skipLoading state
+                      navigate('/', { state: { skipLoading: true } });
                     }}
                   >
                     <span>Sign out</span>

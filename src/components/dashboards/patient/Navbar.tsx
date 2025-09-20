@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, User, ChevronDown, X, Calendar, Clock, MapPin, MessageCircle, Send, Bot } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
-  const { logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   // Language selector state
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<{ code: string; name: string; flag: string }>({ code: 'en', name: 'English', flag: '🇺🇸' });
@@ -156,36 +158,88 @@ const Navbar = () => {
   return (
     <>
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-8xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <div className="flex items-center">
               {/* Solid blue heart, no border */}
               <svg
-                width="32"
-                height="32"
+                className="w-8 h-8 mr-3 text-blue-600"
                 viewBox="0 0 24 24"
-                fill="#2563eb"
+                fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
-                aria-label="MedX logo"
-                className="mr-3"
+                aria-label="blue heart"
+                role="img"
               >
                 <title>MedX</title>
-                <path d="M12 21s-1.45-1.186-3.05-2.614C6.22 16.838 2 13.323 2 9.25 2 6.35 4.35 4 7.25 4c1.62 0 3.12.76 4.08 1.96C12.29 4.76 13.78 4 15.4 4 18.3 4 20.65 6.35 20.65 9.25c0 4.073-4.22 7.588-6.95 9.136C13.45 19.814 12 21 12 21z"/>
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.2 2.58C11.49 5.01 13.16 4 14.9 4 17.4 4 19.4 6 19.4 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
               <span className="text-2xl font-bold text-gray-900">MedX</span>
             </div>
           </div>
 
-          {/* Center Navigation */}
-          <div className="hidden md:block">
-            <div className="flex items-baseline space-x-8">
-              <a href="#" className="text-blue-600 font-medium px-3 py-2 rounded-md bg-blue-50">Home</a>
-              <button onClick={() => setShowApptsModal(true)} className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">Appointments</button>
-              <a href="#" className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">AI Chatbot</a>
-              <button onClick={() => { window.location.href = '/record.html'; }} className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">Records</button>
-              <button onClick={() => setShowChatModal(true)} className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors">Chat</button>
+          {/* Center Navigation (absolute centered) */}
+          <div className="hidden md:flex absolute inset-x-0 justify-center">
+            <div className="flex items-baseline space-x-4">
+              <Link 
+                to="/patient/dashboard"
+                className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                  location.pathname === '/patient/dashboard' || location.pathname === '/patient/dashboard/'
+                    ? 'text-blue-700 bg-blue-100' 
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                Home
+              </Link>
+              <Link 
+                to="/patient/appointments"
+                className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                  location.pathname.startsWith('/patient/appointments')
+                    ? 'text-blue-700 bg-blue-100' 
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                Appointments
+              </Link>
+              <Link 
+                to="/chat"
+                className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                  location.pathname === '/chat'
+                    ? 'text-blue-700 bg-blue-100' 
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                AI Chatbot
+              </Link>
+              <a 
+                href="#/records" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = '/record.html';
+                }}
+                className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                  window.location.hash === '#/records'
+                    ? 'text-blue-700 bg-blue-100' 
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                Records
+              </a>
+              <a 
+                href="#/chat" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowChatModal(true);
+                }}
+                className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                  window.location.hash === '#/chat'
+                    ? 'text-blue-700 bg-blue-100' 
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                Chat
+              </a>
             </div>
           </div>
 
@@ -225,51 +279,88 @@ const Navbar = () => {
     {showChatModal && (
       <div className="fixed inset-0 z-[70] flex items-center justify-center">
         <div className="absolute inset-0 bg-black/50" onClick={() => setShowChatModal(false)} />
-        <div className="relative z-10 w-full max-w-2xl mx-4 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+        <div className="relative z-10 w-full max-w-4xl mx-4 bg-gradient-to-b from-white to-gray-50 rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-5 relative">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <MessageCircle className="w-5 h-5 text-white" />
+          <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white px-6 py-5 relative">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-white/20 rounded-lg backdrop-blur-sm">
+                  <MessageCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">Medical Chat</h3>
+                  <p className="text-sm text-blue-100">Connect with your healthcare providers</p>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold">Chat</h3>
+              <button 
+                aria-label="Close" 
+                onClick={() => setShowChatModal(false)} 
+                className="p-2.5 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
             </div>
-            <button aria-label="Close" onClick={() => setShowChatModal(false)} className="absolute right-3 top-3 p-2 rounded-md hover:bg-white/10">
-              <X className="w-5 h-5 text-white" />
-            </button>
           </div>
 
           {/* Body: Doctors list + Messages */}
           <div className="flex">
             {/* Sidebar: doctors */}
-            <aside className="w-56 border-r border-gray-200 bg-white">
-              <div className="px-4 py-3 text-xs font-semibold text-gray-500">Doctors</div>
-              <div className="px-4 pb-2">
-                <input
-                  value={doctorSearch}
-                  onChange={(e) => setDoctorSearch(e.target.value)}
-                  placeholder="Search doctors..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+            <aside className="w-72 border-r border-gray-200 bg-white">
+              <div className="p-4 border-b border-gray-100">
+                <h4 className="text-sm font-semibold text-gray-900 mb-3">Healthcare Providers</h4>
+                <div className="relative">
+                  <input
+                    value={doctorSearch}
+                    onChange={(e) => setDoctorSearch(e.target.value)}
+                    placeholder="Search by name or specialty..."
+                    className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  />
+                  <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
               </div>
-              <ul className="max-h-[75vh] overflow-y-auto">
-                {filteredDoctors.length === 0 && (
-                  <li className="px-4 py-3 text-sm text-gray-500">No doctors found</li>
-                )}
-                {filteredDoctors.map((d) => (
-                  <li key={d.id}>
-                    <button
-                      onClick={() => setActiveDoctorId(d.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left ${activeDoctorId===d.id ? 'bg-blue-50' : ''}`}
-                    >
-                      <img src={d.avatar} alt={d.name} className="w-8 h-8 rounded-full object-cover" />
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-900 truncate">{d.name}</div>
-                        <div className="text-xs text-gray-600 truncate">{d.specialty}</div>
-                      </div>
-                    </button>
+              <ul className="max-h-[calc(75vh-120px)] overflow-y-auto py-2">
+                {filteredDoctors.length === 0 ? (
+                  <li className="px-4 py-8 text-center">
+                    <div className="text-gray-400 mb-2">
+                      <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm text-gray-500">No doctors found</p>
                   </li>
-                ))}
+                ) : (
+                  filteredDoctors.map((d) => (
+                    <li key={d.id} className="px-3">
+                      <button
+                        onClick={() => setActiveDoctorId(d.id)}
+                        className={`w-full flex items-center gap-1 p-2 rounded-lg transition-all duration-200 ${
+                          activeDoctorId === d.id 
+                            ? 'bg-blue-50 border border-blue-100' 
+                            : 'hover:bg-gray-50 border border-transparent'
+                        }`}
+                      >
+                        <div className="relative">
+                          <img src={d.avatar} alt={d.name} className="w-10 h-10 rounded-full object-cover" />
+                          <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                            activeDoctorId === d.id ? 'bg-green-400' : 'bg-gray-300'
+                          }`}></span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium text-gray-900 truncate">{d.name}</div>
+                          <div className="text-xs text-gray-500 truncate">{d.specialty}</div>
+                          {activeDoctorId === d.id && (
+                            <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              Active Chat
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    </li>
+                  ))
+                )}
               </ul>
             </aside>
 
@@ -294,31 +385,46 @@ const Navbar = () => {
               </div>
 
               {/* Quick actions */}
-              <div className="px-4 pt-3 pb-1 bg-white border-t border-gray-200 flex flex-wrap gap-2">
-                {['Book appointment','Show my reports','Find blood bank','Health tip'].map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setChatInput(q); setTimeout(() => sendChat(), 0); }}
-                    className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  >
-                    {q}
-                  </button>
-                ))}
+              <div className="px-6 pt-4 pb-2 bg-white border-t border-gray-100">
+                <div className="flex flex-wrap gap-2">
+                  {['Book appointment', 'Show my reports', 'Find blood bank', 'Health tip'].map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setChatInput(q); setTimeout(() => sendChat(), 0); }}
+                      className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                        bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 hover:from-blue-100 hover:to-blue-200
+                        border border-blue-200 hover:border-blue-300 hover:shadow-sm"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Input */}
-              <div className="p-4 bg-white border-t border-gray-200">
-                <div className="flex items-center gap-2">
-                  <input
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') sendChat(); }}
-                    placeholder={`Message ${doctors.find(d=>d.id===activeDoctorId)?.name || 'doctor'}...`}
-                    className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button onClick={sendChat} disabled={!chatInput.trim()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <Send className="w-4 h-4" /> Send
-                  </button>
+              <div className="p-6 bg-white border-t border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 relative">
+                    <input
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') sendChat(); }}
+                      placeholder={`Message ${doctors.find(d=>d.id===activeDoctorId)?.name || 'doctor'}...`}
+                      className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        placeholder:text-gray-400 text-gray-600"
+                    />
+                    <button
+                      onClick={sendChat}
+                      disabled={!chatInput.trim()}
+                      className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all duration-200
+                        ${chatInput.trim() 
+                          ? 'text-blue-600 hover:bg-blue-50'
+                          : 'text-gray-300'
+                        }`}
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -392,7 +498,13 @@ const Navbar = () => {
                     View Profile
                   </button>
                   <button
-                    onClick={() => { setShowProfileMenu(false); logout(); }}
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      // Clear user data from localStorage
+                      localStorage.removeItem('user');
+                      // Navigate to root with skipLoading state
+                      navigate('/', { state: { skipLoading: true } });
+                    }}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 last:rounded-b-lg"
                   >
                     Sign out
