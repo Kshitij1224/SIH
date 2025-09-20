@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Plus, Users, FileText, Phone, Mail, MapPin, X, User, Calendar } from 'lucide-react';
+import type React from 'react';
+import { Search, Filter, Plus, Users, FileText, Phone, PhoneCall, PhoneOff, Mic, MicOff, Volume2, VolumeX, Mail, MapPin, X, User, Calendar, Send, Paperclip, MailCheck } from 'lucide-react';
 
 interface Patient {
   id: number;
@@ -34,62 +35,143 @@ export function Patients() {
     status: 'Active'
   });
 
+  // Add Medical Record modal state (moved inside component)
+  const [showAddRecord, setShowAddRecord] = useState(false);
+  const [newRecord, setNewRecord] = useState({
+    date: new Date().toISOString().split('T')[0],
+    type: 'Consultation',
+    visitReason: '',
+    systolic: '',
+    diastolic: '',
+    pulse: '',
+    temperature: '',
+    spo2: '',
+    weightKg: '',
+    heightCm: '',
+    diagnosis: '',
+    prescription: '',
+    notes: '',
+    followUpDate: '',
+    advice: ''
+  });
+
+  const handleNewRecordChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setNewRecord(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Call popup state
+  const [showCall, setShowCall] = useState(false);
+  const [callSeconds, setCallSeconds] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
+
+  // Appointment dates modal state
+  const [showAppointmentDates, setShowAppointmentDates] = useState(false);
+
+  // Mail compose state
+  const [showCompose, setShowCompose] = useState(false);
+  const [composeTo, setComposeTo] = useState('');
+  const [composeSubject, setComposeSubject] = useState('');
+  const [composeBody, setComposeBody] = useState('');
+
+  // Toast notification state (for email sent)
+  const [toast, setToast] = useState<{ visible: boolean; message: string }>(
+    { visible: false, message: '' }
+  );
+  const triggerToast = (message: string) => {
+    setToast({ visible: true, message });
+    window.setTimeout(() => setToast({ visible: false, message: '' }), 3000);
+  };
+
+  useEffect(() => {
+    if (!showCall) return;
+    const id = setInterval(() => setCallSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [showCall]);
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   const [patients, setPatients] = useState<Patient[]>([
     {
       id: 1,
-      name: 'John Smith',
+      name: 'Arjun Sharma',
       age: 45,
       gender: 'Male',
-      phone: '+1 (555) 123-4567',
-      email: 'john.smith@email.com',
-      address: '123 Main St, New York, NY 10001',
+      phone: '+91 98765 43210',
+      email: 'arjun.sharma@example.in',
+      address: 'A-102, Andheri West, Mumbai, Maharashtra 400053',
       lastVisit: '2024-01-10',
       condition: 'Hypertension',
       status: 'Active',
-      avatar: 'JS'
+      avatar: 'AS'
     },
     {
       id: 2,
-      name: 'Emily Davis',
+      name: 'Priya Verma',
       age: 32,
       gender: 'Female',
-      phone: '+1 (555) 234-5678',
-      email: 'emily.davis@email.com',
-      address: '456 Oak Ave, New York, NY 10002',
+      phone: '+91 98670 12345',
+      email: 'priya.verma@example.in',
+      address: 'Sector 18, Noida, Uttar Pradesh 201301',
       lastVisit: '2024-01-08',
-      condition: 'Diabetes Type 2',
+      condition: 'Type 2 Diabetes',
       status: 'Active',
-      avatar: 'ED'
+      avatar: 'PV'
     },
     {
       id: 3,
-      name: 'Michael Brown',
+      name: 'Rohan Mehta',
       age: 58,
       gender: 'Male',
-      phone: '+1 (555) 345-6789',
-      email: 'michael.brown@email.com',
-      address: '789 Pine St, New York, NY 10003',
+      phone: '+91 98200 45678',
+      email: 'rohan.mehta@example.in',
+      address: 'Indiranagar, Bengaluru, Karnataka 560038',
       lastVisit: '2024-01-05',
       condition: 'Heart Disease',
       status: 'Active',
-      avatar: 'MB'
+      avatar: 'RM'
     },
     {
       id: 4,
-      name: 'Sarah Johnson',
+      name: 'Aisha Khan',
       age: 29,
       gender: 'Female',
-      phone: '+1 (555) 456-7890',
-      email: 'sarah.johnson@email.com',
-      address: '321 Elm St, New York, NY 10004',
+      phone: '+91 98111 22334',
+      email: 'aisha.khan@example.in',
+      address: 'Salt Lake, Kolkata, West Bengal 700064',
       lastVisit: '2023-12-28',
       condition: 'Anxiety',
       status: 'Inactive',
-      avatar: 'SJ'
+      avatar: 'AK'
     },
   ]);
 
-  const medicalHistory = [
+  const [medicalHistory, setMedicalHistory] = useState<Array<{
+    date: string;
+    type: string;
+    diagnosis: string;
+    prescription: string;
+    notes: string;
+    visitReason?: string;
+    vitals?: {
+      bp?: string;
+      pulse?: string;
+      temperature?: string;
+      spo2?: string;
+      weightKg?: string;
+      heightCm?: string;
+      bmi?: string;
+    };
+    followUpDate?: string;
+    advice?: string;
+  }>>([
     {
       date: '2024-01-10',
       type: 'Consultation',
@@ -111,7 +193,15 @@ export function Patients() {
       prescription: 'Lisinopril 5mg daily',
       notes: 'Started on ACE inhibitor. Follow up in 6 weeks.'
     },
-  ];
+  ]);
+
+  // Unique appointment dates derived from medicalHistory and patients' lastVisit
+  const appointmentDates = useMemo(() => {
+    const dates = new Set<string>();
+    medicalHistory.forEach(r => dates.add(r.date));
+    patients.forEach(p => p.lastVisit && dates.add(p.lastVisit));
+    return Array.from(dates).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  }, [medicalHistory, patients]);
 
   const filteredPatients = useMemo(() => {
     return [...patients]
@@ -341,18 +431,35 @@ export function Patients() {
                     <button 
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       aria-label="Schedule appointment"
+                      type="button"
+                      title="View appointment dates"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAppointmentDates(true); }}
                     >
                       <Calendar className="w-5 h-5" />
                     </button>
                     <button 
                       className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                       aria-label="Call patient"
+                      onClick={() => { setShowCall(true); setCallSeconds(0); }}
                     >
                       <Phone className="w-5 h-5" />
                     </button>
-                    <button 
+                    <button
                       className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                       aria-label="Email patient"
+                      type="button"
+                      role="button"
+                      title="Compose Email"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (selectedPatient) {
+                          setComposeTo(selectedPatient.email || '');
+                          setComposeSubject('');
+                          setComposeBody('');
+                          setShowCompose(true);
+                        }
+                      }}
                     >
                       <Mail className="w-5 h-5" />
                     </button>
@@ -367,10 +474,21 @@ export function Patients() {
                         <Phone className="w-4 h-4 text-gray-400" />
                         <span>{selectedPatient.phone}</span>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm">
-                        <Mail className="w-4 h-4 text-gray-400" />
-                        <span>{selectedPatient.email}</span>
-                      </div>
+                      <button
+                        type="button"
+                        className="flex items-center space-x-2 text-sm group"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setComposeTo(selectedPatient.email || '');
+                          setComposeSubject('');
+                          setComposeBody('');
+                          setShowCompose(true);
+                        }}
+                        title="Compose Email"
+                      >
+                        <Mail className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
+                        <span className="text-gray-700 group-hover:text-purple-700 underline">{selectedPatient.email}</span>
+                      </button>
                       <div className="flex items-start space-x-2 text-sm">
                         <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
                         <span>{selectedPatient.address}</span>
@@ -397,7 +515,11 @@ export function Patients() {
                       <FileText className="w-5 h-5 mr-2" />
                       Medical History
                     </h3>
-                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    <button
+                      onClick={() => setShowAddRecord(true)}
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      type="button"
+                    >
                       Add Record
                     </button>
                   </div>
@@ -640,6 +762,446 @@ export function Patients() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Compose Email Modal */}
+      {showCompose && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h2 className="text-lg font-semibold">Compose Email</h2>
+              <button
+                onClick={() => setShowCompose(false)}
+                className="text-gray-500 hover:text-gray-700"
+                aria-label="Close compose"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!composeTo || !composeSubject || !composeBody) {
+                  alert('Please fill in To, Subject and Message');
+                  return;
+                }
+                triggerToast(`Email sent to ${composeTo}`);
+                setShowCompose(false);
+              }}
+              className="px-6 py-5 space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                <input
+                  type="email"
+                  value={composeTo}
+                  onChange={(e) => setComposeTo(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="patient@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <input
+                  type="text"
+                  value={composeSubject}
+                  onChange={(e) => setComposeSubject(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Regarding your recent visit"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                <textarea
+                  value={composeBody}
+                  onChange={(e) => setComposeBody(e.target.value)}
+                  rows={8}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Write your message here..."
+                  required
+                />
+              </div>
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  type="button"
+                  className="inline-flex items-center px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  onClick={() => alert('Attachment feature coming soon')}
+                >
+                  <Paperclip className="w-4 h-4 mr-2" />
+                  Attach
+                </button>
+                <div className="space-x-3">
+                  <button
+                    type="button"
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    onClick={() => setShowCompose(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="inline-flex items-center px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Call Popup */}
+      {showCall && selectedPatient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="w-[28rem] md:w-[32rem] bg-white border border-gray-200 shadow-2xl rounded-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b bg-green-50 flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-green-700">
+                <PhoneCall className="w-6 h-6" />
+                <span className="text-base font-semibold">Calling {selectedPatient.name}</span>
+              </div>
+              <span className="text-sm text-gray-700">{formatTime(callSeconds)}</span>
+            </div>
+            <div className="p-6 flex items-center space-x-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg">
+                {selectedPatient.avatar}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-lg font-semibold text-gray-900 truncate">{selectedPatient.name}</div>
+                <div className="text-base text-gray-700 truncate">{selectedPatient.phone}</div>
+              </div>
+            </div>
+            <div className="px-6 pb-6 pt-2 flex items-center justify-between">
+              <button
+                onClick={() => setIsMuted((m) => !m)}
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm border ${isMuted ? 'bg-red-50 text-red-700 border-red-300' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}`}
+                aria-pressed={isMuted}
+                aria-label="Toggle mute"
+              >
+                {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                <span>{isMuted ? 'Muted' : 'Mute'}</span>
+              </button>
+              <button
+                onClick={() => setIsSpeakerOn((s) => !s)}
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm border ${isSpeakerOn ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'}`}
+                aria-label="Speaker"
+                aria-pressed={isSpeakerOn}
+              >
+                {isSpeakerOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                <span>{isSpeakerOn ? 'Speaker On' : 'Speaker Off'}</span>
+              </button>
+              <button
+                onClick={() => { setShowCall(false); setCallSeconds(0); setIsMuted(false); }}
+                className="flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm bg-red-600 text-white hover:bg-red-700"
+                aria-label="End call"
+              >
+                <PhoneOff className="w-5 h-5" />
+                <span>End</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showAppointmentDates && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h2 className="text-lg font-semibold flex items-center">
+                <Calendar className="w-5 h-5 mr-2 text-blue-600" /> Appointment Dates
+              </h2>
+              <button
+                onClick={() => setShowAppointmentDates(false)}
+                className="text-gray-500 hover:text-gray-700"
+                aria-label="Close appointment dates"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-6 py-5">
+              {appointmentDates.length > 0 ? (
+                <ul className="space-y-2 max-h-64 overflow-auto">
+                  {appointmentDates.map(date => (
+                    <li key={date} className="flex items-center justify-between border border-gray-100 rounded-lg px-3 py-2">
+                      <span className="text-gray-800">{new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                      <span className="text-xs text-gray-500">{date}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-center text-gray-600 py-6">No appointment dates available</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {showAddRecord && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h2 className="text-lg font-semibold">Add Recent Check-up Record</h2>
+              <button
+                onClick={() => setShowAddRecord(false)}
+                className="text-gray-500 hover:text-gray-700"
+                aria-label="Close add record"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!newRecord.diagnosis || !newRecord.type || !newRecord.date) {
+                  alert('Please fill in Date, Type and Diagnosis');
+                  return;
+                }
+                let bmi = '';
+                const w = parseFloat(newRecord.weightKg || '');
+                const h = parseFloat(newRecord.heightCm || '');
+                if (!isNaN(w) && !isNaN(h) && h > 0) {
+                  const hM = h / 100;
+                  bmi = (w / (hM * hM)).toFixed(1);
+                }
+                setMedicalHistory(prev => [
+                  {
+                    date: newRecord.date,
+                    type: newRecord.type,
+                    diagnosis: newRecord.diagnosis,
+                    prescription: newRecord.prescription,
+                    notes: newRecord.notes,
+                    visitReason: newRecord.visitReason,
+                    vitals: {
+                      bp: newRecord.systolic && newRecord.diastolic ? `${newRecord.systolic}/${newRecord.diastolic} mmHg` : undefined,
+                      pulse: newRecord.pulse,
+                      temperature: newRecord.temperature,
+                      spo2: newRecord.spo2,
+                      weightKg: newRecord.weightKg,
+                      heightCm: newRecord.heightCm,
+                      bmi
+                    },
+                    followUpDate: newRecord.followUpDate,
+                    advice: newRecord.advice
+                  },
+                  ...prev,
+                ]);
+                setShowAddRecord(false);
+                setNewRecord({
+                  date: new Date().toISOString().split('T')[0],
+                  type: 'Consultation',
+                  visitReason: '',
+                  systolic: '',
+                  diastolic: '',
+                  pulse: '',
+                  temperature: '',
+                  spo2: '',
+                  weightKg: '',
+                  heightCm: '',
+                  diagnosis: '',
+                  prescription: '',
+                  notes: '',
+                  followUpDate: '',
+                  advice: ''
+                });
+                triggerToast('Medical record added');
+              }}
+              className="px-6 py-5 space-y-6"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={newRecord.date}
+                    onChange={handleNewRecordChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select
+                    name="type"
+                    value={newRecord.type}
+                    onChange={handleNewRecordChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option>Consultation</option>
+                    <option>Lab Results</option>
+                    <option>Follow-up</option>
+                    <option>Procedure</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Reason for Visit</label>
+                  <input
+                    type="text"
+                    name="visitReason"
+                    value={newRecord.visitReason}
+                    onChange={handleNewRecordChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., Routine check-up, fever, etc."
+                  />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Vitals</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      name="systolic"
+                      value={newRecord.systolic}
+                      onChange={handleNewRecordChange}
+                      placeholder="Systolic"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-500">/</span>
+                    <input
+                      type="number"
+                      name="diastolic"
+                      value={newRecord.diastolic}
+                      onChange={handleNewRecordChange}
+                      placeholder="Diastolic"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <input
+                    type="number"
+                    name="pulse"
+                    value={newRecord.pulse}
+                    onChange={handleNewRecordChange}
+                    placeholder="Pulse (bpm)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    step="0.1"
+                    name="temperature"
+                    value={newRecord.temperature}
+                    onChange={handleNewRecordChange}
+                    placeholder="Temp (°C)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    name="spo2"
+                    value={newRecord.spo2}
+                    onChange={handleNewRecordChange}
+                    placeholder="SpO₂ (%)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    step="0.1"
+                    name="weightKg"
+                    value={newRecord.weightKg}
+                    onChange={handleNewRecordChange}
+                    placeholder="Weight (kg)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    name="heightCm"
+                    value={newRecord.heightCm}
+                    onChange={handleNewRecordChange}
+                    placeholder="Height (cm)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Diagnosis</label>
+                  <input
+                    type="text"
+                    name="diagnosis"
+                    value={newRecord.diagnosis}
+                    onChange={handleNewRecordChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter diagnosis"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Prescription</label>
+                  <input
+                    type="text"
+                    name="prescription"
+                    value={newRecord.prescription}
+                    onChange={handleNewRecordChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., Metformin 500mg"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  name="notes"
+                  value={newRecord.notes}
+                  onChange={handleNewRecordChange}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Additional notes"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Follow-up Date</label>
+                  <input
+                    type="date"
+                    name="followUpDate"
+                    value={newRecord.followUpDate}
+                    onChange={handleNewRecordChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Advice</label>
+                  <input
+                    type="text"
+                    name="advice"
+                    value={newRecord.advice}
+                    onChange={handleNewRecordChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Diet, rest, etc."
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddRecord(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Save Record
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Toast: Email Sent */}
+      {toast.visible && (
+        <div className="fixed top-6 right-6 z-[100] pointer-events-none" role="status" aria-live="polite">
+          <div className="flex items-start space-x-3 bg-white border border-green-200 shadow-lg rounded-lg px-4 py-3">
+            <div className="mt-0.5 text-green-600">
+              <MailCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">{toast.message}</p>
+              <p className="text-xs text-gray-500 mt-0.5">The email has been queued for delivery.</p>
+            </div>
           </div>
         </div>
       )}

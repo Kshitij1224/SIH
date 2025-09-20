@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Send, Bot, User } from 'lucide-react';
+import { X, Send, Bot, User, Calendar, Clock, Video, Users } from 'lucide-react';
 
 interface AIAssistantProps {
   onClose: () => void;
@@ -14,14 +14,31 @@ export function AIAssistant({ onClose }: AIAssistantProps) {
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [scheduleItems] = useState<Array<{
+    id: number;
+    type: 'appointment' | 'meeting';
+    title: string;
+    with?: string;
+    time: string; // ISO string
+    location?: string;
+  }>>([
+    { id: 1, type: 'appointment', title: 'Consultation', with: 'John Smith', time: new Date().toISOString(), location: 'Clinic Room 3' },
+    { id: 2, type: 'appointment', title: 'Follow-up', with: 'Emily Davis', time: new Date(Date.now() + 60*60*1000).toISOString(), location: 'Clinic Room 2' },
+    { id: 3, type: 'meeting', title: 'Cardiology Dept. Standup', time: new Date(Date.now() + 2*60*60*1000).toISOString(), location: 'Conference Room A' },
+    { id: 4, type: 'meeting', title: 'Video consult', with: 'Michael Brown', time: new Date(Date.now() + 4*60*60*1000).toISOString(), location: 'Online' },
+  ]);
+
 
   const quickActions = [
     'Patient summary for John Smith',
     'Latest hypertension guidelines',
     'Government health schemes',
     'Drug interaction checker',
-    'ICD-10 codes for diabetes'
+    'ICD-10 codes for diabetes',
+    'View schedule'
   ];
+
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
@@ -39,7 +56,17 @@ export function AIAssistant({ onClose }: AIAssistantProps) {
     }
   };
 
+
   const handleQuickAction = (action: string) => {
+    if (action.toLowerCase().includes('schedule')) {
+      setShowSchedule(true);
+      setMessages(prev => ([
+        ...prev,
+        { id: prev.length + 1, type: 'user', content: action },
+        { id: prev.length + 2, type: 'ai', content: 'Opening your schedule for today…' }
+      ]));
+      return;
+    }
     const newMessages = [
       ...messages,
       { id: messages.length + 1, type: 'user', content: action },
@@ -51,6 +78,7 @@ export function AIAssistant({ onClose }: AIAssistantProps) {
     ];
     setMessages(newMessages);
   };
+
 
   return (
     <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full">
@@ -129,6 +157,53 @@ export function AIAssistant({ onClose }: AIAssistantProps) {
           </button>
         </div>
       </div>
+
+      {/* Schedule Modal */}
+      {showSchedule && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div className="px-5 py-4 border-b flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-5 h-5 text-blue-600" />
+                <span className="text-sm font-semibold text-gray-900">Today’s Schedule</span>
+              </div>
+              <button
+                onClick={() => setShowSchedule(false)}
+                className="p-1 rounded-md hover:bg-gray-100"
+                aria-label="Close schedule"
+              >
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+            <div className="p-5 max-h-[70vh] overflow-y-auto">
+              <div className="space-y-3">
+                {scheduleItems
+                  .slice()
+                  .sort((a,b) => new Date(a.time).getTime() - new Date(b.time).getTime())
+                  .map(item => (
+                    <div key={item.id} className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-3">
+                          <div className={`p-2 rounded-lg ${item.type === 'appointment' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
+                            {item.type === 'appointment' ? <Users className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{item.title}{item.with ? ` • ${item.with}` : ''}</div>
+                            <div className="text-xs text-gray-500 flex items-center mt-1">
+                              <Clock className="w-3.5 h-3.5 mr-1" />
+                              {new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {item.location ? <span className="ml-2">• {item.location}</span> : null}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
