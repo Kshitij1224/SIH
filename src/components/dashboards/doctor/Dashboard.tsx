@@ -647,23 +647,9 @@ export function Dashboard() {
     return () => clearInterval(id);
   }, [showVideoCall]);
 
-  // Mock weekly reports data (last 7 days)
-  const getLast7Days = () => {
-    const days: { label: string; date: Date }[] = [];
-    const formatter = new Intl.DateTimeFormat('en-IN', { weekday: 'short' });
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      days.push({ label: formatter.format(d), date: d });
-    }
-    return days;
-  };
-  const weeklyReports = getLast7Days().map(({ label, date }, idx) => ({
-    label,
-    // Simulate report counts using appointments as a rough proxy + a small offset
-    count: (appointments.filter(a => new Date().getDay() === date.getDay()).length + ((idx % 3))) || (idx % 4),
-  }));
-  const maxReports = Math.max(1, ...weeklyReports.map(d => d.count));
+
+
+
 
   // Get appointments for today
   const getTodaysAppointments = useCallback(() => {
@@ -1255,8 +1241,10 @@ export function Dashboard() {
             <h2 className="text-lg font-semibold text-gray-900">Prescription</h2>
           </div>
           <div className="p-6 space-y-4">
-            <button 
-              onClick={() => setShowPrescriptionModal(true)}
+            <a 
+              href="https://prescriptiongeneratorsih.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full flex items-center p-4 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-200 transition-colors text-left"
             >
               <div className="p-2 rounded-lg bg-blue-100 text-blue-600 mr-3">
@@ -1266,7 +1254,7 @@ export function Dashboard() {
                 <div className="text-sm font-medium text-gray-900">Create New Prescription</div>
                 <div className="text-xs text-gray-500">Generate prescriptions for patients</div>
               </div>
-            </button>
+            </a>
             <button 
               onClick={() => setShowRecentPrescriptions(true)}
               className="w-full flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-left"
@@ -1300,18 +1288,20 @@ export function Dashboard() {
             <h2 className="text-lg font-semibold text-gray-900">Report Analysis</h2>
           </div>
           <div className="p-6 space-y-4">
-            <button 
-              onClick={() => setShowUploadModal(true)}
-              className="w-full flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-left"
+            <a 
+              href="https://aesthetic-melba-d63008.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center p-4 rounded-lg border border-gray-200 hover:bg-purple-50 hover:border-purple-200 transition-colors text-left"
             >
-              <div className="p-2 rounded-lg bg-amber-100 text-amber-600 mr-3">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-600 mr-3">
                 <FlaskConical className="w-5 h-5" />
               </div>
               <div>
                 <div className="text-sm font-medium text-gray-900">Analyze Lab Results</div>
                 <div className="text-xs text-gray-500">Upload and analyze lab reports</div>
               </div>
-            </button>
+            </a>
             
             {!showReport ? (
               <button 
@@ -1818,121 +1808,12 @@ export function Dashboard() {
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* Main Content Grid - 3 Column Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {/* Column 1: Prescription Maker */}
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Prescription Maker</h2>
-          <div className="space-y-4">
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Stethoscope className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Create New Prescription</h3>
-                  <p className="text-sm text-gray-500">Generate prescriptions for patients</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-green-50 transition-colors cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Recent Prescriptions</h3>
-                  <p className="text-sm text-gray-500">View and manage past prescriptions</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Calendar className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Prescription History</h3>
-                  <p className="text-sm text-gray-500">Track all prescribed medications</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Column 2: Report Analysis */}
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Report Analysis</h2>
-          <div className="space-y-4">
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <TrendingUp className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Analyze Lab Results</h3>
-                  <p className="text-sm text-gray-500">Review and interpret patient lab reports</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-yellow-50 transition-colors cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-yellow-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Generate Reports</h3>
-                  <p className="text-sm text-gray-500">Create detailed medical reports</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Users className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Patient Reports</h3>
-                  <p className="text-sm text-gray-500">Access all patient medical reports</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Column 3: Quick Actions */}
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
-              <Calendar className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-              <div className="text-sm font-medium text-gray-900">Schedule</div>
-            </button>
-            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-green-50 transition-colors">
-              <Users className="w-6 h-6 text-green-600 mx-auto mb-2" />
-              <div className="text-sm font-medium text-gray-900">Add Patient</div>
-            </button>
-            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-purple-50 transition-colors">
-              <MessageSquare className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-              <div className="text-sm font-medium text-gray-900">Messages</div>
-            </button>
-            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-orange-50 transition-colors">
-              <TrendingUp className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-              <div className="text-sm font-medium text-gray-900">Reports</div>
-            </button>
-            <button className="p-4 text-center rounded-lg border border-gray-200 hover:bg-red-50 transition-colors col-span-2">
-              <Stethoscope className="w-6 h-6 text-red-600 mx-auto mb-2" />
-              <div className="text-sm font-medium text-gray-900">Start Video Consultation</div>
-            </button>
-          </div>
-=======
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Today's Appointments */}
         <div className="lg:col-span-2">
           {/* Today's Appointments content */}
->>>>>>> bdf084e24e93b546a7ec903faa8e3f2fe21007a3
         </div>
       </div>
 
@@ -3118,3 +2999,4 @@ export function Dashboard() {
     </div>
   );
 }
+
