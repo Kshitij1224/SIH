@@ -1,17 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Bot, MessageSquare, ArrowRight, Zap, Shield, Mic, Globe } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Bot, MessageSquare, ArrowRight, ClipboardPlus, Shield, Mic, Globe } from 'lucide-react';
+
 
 const AIChatbot: React.FC = () => {
-  const navigate = useNavigate();
+  
 
   const features = [
     {
-      icon: <Zap className="w-6 h-6 text-blue-600" />,
-      title: "Instant Responses",
-      description: "Get immediate answers to your health questions 24/7",
+      icon: <ClipboardPlus className="w-6 h-6 text-blue-600" />,
+      title: "Analyze & Understand Your Prescriptions",
+      description: "Upload your prescription for instant medicine guidance and instructions.",
       bgColor: 'from-blue-50 to-blue-100',
       iconBg: 'bg-blue-100',
       iconColor: 'text-blue-600',
@@ -106,7 +106,7 @@ const AIChatbot: React.FC = () => {
                 ))}
               </div>
               <Button 
-                onClick={() => navigate('/chat')}
+                onClick={() => window.location.href = "https://medxbot.netlify.app/"}
                 className="w-full py-6 text-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all transform hover:-translate-y-0.5"
               >
                 <MessageSquare className="w-5 h-5 mr-2" />

@@ -117,7 +117,7 @@ const AppContent = () => {
                     />
                   </div>
                   <p className="text-xl md:text-xl text-gray-200 mt-10 mb-8 max-w-3xl mx-auto">
-                  MedX is a unified digital healthcare platform integrating electronic health records, AI diagnostics, doctor discovery, and telemedicine, delivering trusted, inclusive, and accessible healthcare solutions for patients, doctors, and hospitals across India.
+                   MedX - One platform for all your healthcare needs. From records to AI-powered diagnostics, doctor discovery to telemedicine, we make trusted care accessible to everyone, everywhere in India.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
